@@ -6,7 +6,15 @@ using UnityEngine;
 public struct MyQuaternion : IEquatable<MyQuaternion>
 {
 	#region valores
-	//es un numero y esta en la clase Quaternion, no se para que sirve.
+	public float x;
+
+	public float y;
+
+	public float z;
+
+	public float w;
+
+
 	public const float kEpsilon = 1E-06f;
 
 
@@ -25,13 +33,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	}
 
 
-	public float x;
-
-	public float y;
-
-	public float z;
-
-	public float w;
+	
 
 	public float this[int index]
 	{
@@ -83,24 +85,22 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 
 
 
-	/// <summary>
-	///   <para>Te devuelve el angulo en grados, ya que para conseguir los angulos con ToEulerRag te los da en radianes.</para>
-	/// </summary>
+	//   Te devuelve el angulo en grados, ya que para conseguir los angulos con ToEulerRag te los da en radianes.</para>
 	public Vector3 eulerAngles
 	{
 		get
 		{
-			return MyQuaternion.ToEulerRad(this) * Mathf.Rad2Deg;
+			//lo pasa a grados.
+			return ToEulerRad(this) * Mathf.Rad2Deg;
 		}
 		set
 		{
-			this = MyQuaternion.FromEulerRad(value * Mathf.Deg2Rad);
+			//lo pasa a radeanes para convertirlo en quaternion.
+			this = FromEulerRad(value * Mathf.Deg2Rad);
 		}
 	}
-	/// <summary>
-	/// returns this quaternion whit a magnutude of 1 (Read Only).
-	/// </summary>
 
+	// Te devuelve el quaternion con la magnitud en 1.
 	public MyQuaternion normalized
     {
         get
@@ -112,21 +112,16 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
             return q;
         }
     }
-	/// <summary>
-	/// Gets the length (magnitude) of the quaternion.
-	/// </summary>
-
+	// magnitud del quaternion.
     public float Length
 	{
 		get
 		{
-			return (float)System.Math.Sqrt(x * x + y * y + z * z + w * w);
+			return Mathf.Sqrt(x * x + y * y + z * z + w * w);
 		}
 	}
 
-	/// <summary>
-	/// Gets the square of the quaternion length (magnitude).
-	/// </summary>
+	// te devuelve la raiz de la magnitud del quaternion.
     public float LengthSquared
 	{
 		get
@@ -240,45 +235,42 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	}
 	public void ToAngleAxis(out float angle, out Vector3 axis)
 	{
-		MyQuaternion.ToAxisAngleRad(this, out axis, out angle);
+		ToAxisAngleRad(this, out axis, out angle);
 		angle *= Mathf.Rad2Deg;
 	}
 	/// <summary>
-	///   <para>Creates a rotation which rotates from /fromDirection/ to /toDirection/.</para>
+	///   <para>crea una rotacion desdelaDireccion a la direccion2.</para>
+	///   Esta no entiendo para que esta... no que hace, lo mismo que la siguiente crea una rotacion entre 2 direcciones pero porque hay 2.
 	/// </summary>
-	/// <param name="fromDirection"></param>
-	/// <param name="toDirection"></param>
 	public static MyQuaternion FromToRotation(Vector3 fromDirection, Vector3 toDirection)
 	{
 		return RotateTowards(LookRotation(fromDirection), LookRotation(toDirection), float.MaxValue);
 	}
 	/// <summary>
-	///   <para>Creates a rotation which rotates from /fromDirection/ to /toDirection/.</para>
+	///   <para>crea una rotacion desdelaDireccion a la direccion2.</para>
 	/// </summary>
-	/// <param name="fromDirection"></param>
-	/// <param name="toDirection"></param>
 	public void SetFromToRotation(Vector3 fromDirection, Vector3 toDirection)
 	{
-		this = MyQuaternion.FromToRotation(fromDirection, toDirection);
+		this = FromToRotation(fromDirection, toDirection);
 	}
-	/// <summary>
-	///   <para>Creates a rotation with the specified /forward/ and /upwards/ directions.</para>
-	/// </summary>
-	/// <param name="forward">The direction to look in.</param>
-	/// <param name="upwards">The vector that defines in which direction up is.</param>
 	public static MyQuaternion LookRotation(Vector3 forward, [DefaultValue("Vector3.up")] Vector3 upwards)
 	{
-		return MyQuaternion.LookRotation(ref forward, ref upwards);
+		return LookRotation(ref forward, ref upwards);
 	}
 	public static MyQuaternion LookRotation(Vector3 forward)
 	{
 		Vector3 up = Vector3.up;
-		return MyQuaternion.LookRotation(ref forward, ref up);
+		return LookRotation(ref forward, ref up);
 	}
-	// from http://answers.unity3d.com/questions/467614/what-is-the-source-code-of-quaternionlookrotation.html
+	/// <summary>
+	///estoy es muy complejo amigo.
+	///my resumido, se plantea una matriz.
+	///si sabes que la magnitud del quaternion es 1 y sabes todas las componentes,
+	///podes ir haciendo preguntar para ir descartando y saber cual no es el 0.
+	///siempre entra en alguno de los ifs, estos son principalmente para no entrar en un nan.
+	/// </summary>
 	private static MyQuaternion LookRotation(ref Vector3 forward, ref Vector3 up)
 	{
-
 		forward = Vector3.Normalize(forward);
 		Vector3 right = Vector3.Normalize(Vector3.Cross(up, forward));
 		up = Vector3.Cross(forward, right);
@@ -297,7 +289,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		var quaternion = new MyQuaternion();
 		if (num8 > 0f)
 		{
-			var num = (float)System.Math.Sqrt(num8 + 1f);
+			var num = Mathf.Sqrt(num8 + 1f);
 			quaternion.w = num * 0.5f;
 			num = 0.5f / num;
 			quaternion.x = (m12 - m21) * num;
@@ -307,7 +299,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		}
 		if ((m00 >= m11) && (m00 >= m22))
 		{
-			var num7 = (float)System.Math.Sqrt(((1f + m00) - m11) - m22);
+			var num7 = Mathf.Sqrt(((1f + m00) - m11) - m22);
 			var num4 = 0.5f / num7;
 			quaternion.x = 0.5f * num7;
 			quaternion.y = (m01 + m10) * num4;
@@ -317,7 +309,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		}
 		if (m11 > m22)
 		{
-			var num6 = (float)System.Math.Sqrt(((1f + m11) - m00) - m22);
+			var num6 = Mathf.Sqrt(((1f + m11) - m00) - m22);
 			var num3 = 0.5f / num6;
 			quaternion.x = (m10 + m01) * num3;
 			quaternion.y = 0.5f * num6;
@@ -325,7 +317,8 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			quaternion.w = (m20 - m02) * num3;
 			return quaternion;
 		}
-		var num5 = (float)System.Math.Sqrt(((1f + m22) - m00) - m11);
+		//ningun componente es igual a 0.
+		var num5 = Mathf.Sqrt(((1f + m22) - m00) - m11);
 		var num2 = 0.5f / num5;
 		quaternion.x = (m20 + m02) * num2;
 		quaternion.y = (m21 + m12) * num2;
@@ -333,19 +326,23 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		quaternion.w = (m01 - m10) * num2;
 		return quaternion;
 	}
+	/// <summary>
+	///   Crea la rotacion de donde mira y con que cara, que por defecto es up.
+	/// view es la direccion a donde va a mirar.
+	/// </summary>
 	public void SetLookRotation(Vector3 view)
 	{
 		Vector3 up = Vector3.up;
-		this.SetLookRotation(view, up);
+		SetLookRotation(view, up);
 	}
 	/// <summary>
-	///   <para>Creates a rotation with the specified /forward/ and /upwards/ directions.</para>
+	///   Crea la rotacion de donde mira y adonde.
+	/// view es la direccion a donde va a mirar.
+	/// up es la cara que va a mirar en esa direccion.
 	/// </summary>
-	/// <param name="view">The direction to look in.</param>
-	/// <param name="up">The vector that defines in which direction up is.</param>
 	public void SetLookRotation(Vector3 view, [DefaultValue("Vector3.up")] Vector3 up)
 	{
-		this = MyQuaternion.LookRotation(view, up);
+		this = LookRotation(view, up);
 	}
 	/// <summary>
 	///   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is clamped to the range [0, 1].</para>
@@ -524,8 +521,12 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	{
 		return MyQuaternion.FromEulerRad(euler * Mathf.Deg2Rad);
 	}
+	/// <summary>
+	///pasa de quaternion a euler.
+	/// </summary>
 	private static Vector3 ToEulerRad(MyQuaternion rotation)
 	{
+		//singularidad: dada sieras reglas matemacias no funciona.
 		float sqw = rotation.w * rotation.w;
 		float sqx = rotation.x * rotation.x;
 		float sqy = rotation.y * rotation.y;
@@ -533,7 +534,8 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		float unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
 		float test = rotation.x * rotation.w - rotation.y * rotation.z;
 		Vector3 v;
-
+		//no tengo ni la menor idea de que son las singularidades de los polos.
+		//si x esta muy cerca de 90 o de - 90 se corrigen. porque x e y pasan a fucionarse.
 		if (test > 0.4995f * unit)
 		{ // singularity at north pole
 			v.y = 2f * Mathf.Atan2(rotation.y, rotation.x);
@@ -548,12 +550,44 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			v.z = 0;
 			return NormalizeAngles(v * Mathf.Rad2Deg);
 		}
+		//si el quaternion no esta cerca de sus polos, se transforma de la manera contraria a fromEulerRad.
+		//al principio no entendia el orden de este nuevo quaternion, pero es asi porque el orden afecta el resultado.
 		MyQuaternion q = new MyQuaternion(rotation.w, rotation.z, rotation.x, rotation.y);
-		v.y = (float)System.Math.Atan2(2f * q.x * q.w + 2f * q.y * q.z, 1 - 2f * (q.z * q.z + q.w * q.w));     // Yaw
-		v.x = (float)System.Math.Asin(2f * (q.x * q.z - q.w * q.y));                             // Pitch
-		v.z = (float)System.Math.Atan2(2f * q.x * q.y + 2f * q.z * q.w, 1 - 2f * (q.y * q.y + q.z * q.z));      // Roll
+		v.y = Mathf.Atan2(2f * q.x * q.w + 2f * q.y * q.z, 1 - 2f * (q.z * q.z + q.w * q.w));       // Yaw
+		v.x = Mathf.Asin(2f * (q.x * q.z - q.w * q.y));												// Pitch
+		v.z = Mathf.Atan2(2f * q.x * q.y + 2f * q.z * q.w, 1 - 2f * (q.y * q.y + q.z * q.z));       // Roll
 		return NormalizeAngles(v * Mathf.Rad2Deg);
 	}
+	/// <summary>
+	///pasa de euler a quaternion.
+	/// </summary>
+	private static MyQuaternion FromEulerRad(Vector3 euler)
+	{
+		
+		MyQuaternion value;
+		//el 0.5f es la mitad de grado a radian.
+		//para el euler a radianes.
+		euler.x = euler.x * 0.5f;
+		euler.y = euler.y * 0.5f;
+		euler.z = euler.z * 0.5f;
+
+		float sinX = Mathf.Sin(euler.x);
+		float cosX = Mathf.Cos(euler.x);
+		float sinY = Mathf.Sin(euler.y);
+		float cosY = Mathf.Cos(euler.y);
+		float sinZ = Mathf.Sin(euler.z);
+		float cosZ = Mathf.Cos(euler.z);
+
+		value.w = cosY * cosX * cosZ + sinY * sinX * sinZ;
+		value.x = cosY * sinX * cosZ + sinY * cosX * sinZ;
+		value.y = sinY * cosX * cosZ - cosY * sinX * sinZ;
+		value.z = cosY * cosX * sinZ - sinY * sinX * cosZ;
+
+		return value;
+	}
+	/// <summary>
+	///devuelve todos los angulos de 360 a 0.
+	/// </summary>
 	private static Vector3 NormalizeAngles(Vector3 angles)
 	{
 		angles.x = NormalizeAngle(angles.x);
@@ -561,6 +595,9 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		angles.z = NormalizeAngle(angles.z);
 		return angles;
 	}
+	/// <summary>
+	///normalizar el angulo es hacer que siempre esten de 360 a 0, si se pasa de 360 se resta, si se pasa de 0 se suma 360.
+	/// </summary>
 	private static float NormalizeAngle(float angle)
 	{
 		while (angle > 360)
@@ -569,35 +606,14 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			angle += 360;
 		return angle;
 	}
-	// from http://stackoverflow.com/questions/11492299/quaternion-to-euler-angles-algorithm-how-to-convert-to-y-up-and-between-ha
-	private static MyQuaternion FromEulerRad(Vector3 euler)
-	{
-		var yaw = euler.x;
-		var pitch = euler.y;
-		var roll = euler.z;
-		float rollOver2 = roll * 0.5f;
-		float sinRollOver2 = (float)System.Math.Sin((float)rollOver2);
-		float cosRollOver2 = (float)System.Math.Cos((float)rollOver2);
-		float pitchOver2 = pitch * 0.5f;
-		float sinPitchOver2 = (float)System.Math.Sin((float)pitchOver2);
-		float cosPitchOver2 = (float)System.Math.Cos((float)pitchOver2);
-		float yawOver2 = yaw * 0.5f;
-		float sinYawOver2 = (float)System.Math.Sin((float)yawOver2);
-		float cosYawOver2 = (float)System.Math.Cos((float)yawOver2);
-		MyQuaternion result;
-		result.x = cosYawOver2 * cosPitchOver2 * cosRollOver2 + sinYawOver2 * sinPitchOver2 * sinRollOver2;
-		result.y = cosYawOver2 * cosPitchOver2 * sinRollOver2 - sinYawOver2 * sinPitchOver2 * cosRollOver2;
-		result.z = cosYawOver2 * sinPitchOver2 * cosRollOver2 + sinYawOver2 * cosPitchOver2 * sinRollOver2;
-		result.w = sinYawOver2 * cosPitchOver2 * cosRollOver2 - cosYawOver2 * sinPitchOver2 * sinRollOver2;
-		return result;
 
-	}
+	//deprecado.
 	private static void ToAxisAngleRad(MyQuaternion q, out Vector3 axis, out float angle)
 	{
 		if (System.Math.Abs(q.w) > 1.0f)
 			q.Normalize();
-		angle = 2.0f * (float)System.Math.Acos(q.w); // angle
-		float den = (float)System.Math.Sqrt(1.0 - q.w * q.w);
+		angle = 2.0f * Mathf.Acos(q.w); // angle
+		float den = Mathf.Sqrt(1.0f - q.w * q.w);
 		if (den > 0.0001f)
 		{
 			axis = q.xyz / den;
@@ -609,10 +625,17 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			axis = new Vector3(1, 0, 0);
 		}
 	}
-    public override int GetHashCode()
+
+	/// <summary>
+	///Es como la ide del objeto.
+	/// </summary>
+	public override int GetHashCode()
 	{
-		return this.x.GetHashCode() ^ this.y.GetHashCode() << 2 ^ this.z.GetHashCode() >> 2 ^ this.w.GetHashCode() >> 1;
+		return x.GetHashCode() ^ y.GetHashCode() << 2 ^ z.GetHashCode() >> 2 ^ w.GetHashCode() >> 1;
 	}
+	/// <summary>
+	///pregunta si es igual.
+	/// </summary>
 	public override bool Equals(object other)
 	{
 		if (!(other is MyQuaternion))
@@ -620,16 +643,35 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			return false;
 		}
 		MyQuaternion quaternion = (MyQuaternion)other;
-		return this.x.Equals(quaternion.x) && this.y.Equals(quaternion.y) && this.z.Equals(quaternion.z) && this.w.Equals(quaternion.w);
+		return x.Equals(quaternion.x) && y.Equals(quaternion.y) && z.Equals(quaternion.z) && w.Equals(quaternion.w);
 	}
+	/// <summary>
+	///pregunta si es igual.
+	/// </summary>
 	public bool Equals(MyQuaternion other)
 	{
 		return this.x.Equals(other.x) && this.y.Equals(other.y) && this.z.Equals(other.z) && this.w.Equals(other.w);
 	}
+	/// <summary>
+	///multiplica los quaterniones. como el exel que vimos en la clase.
+	///ijk=-1
+	///x*x=-1
+	///y*y=-1
+	///es una distribuida.
+	/// los menos son por la propiedad de arriba.
+	/// 
+	/// </summary>
 	public static MyQuaternion operator *(MyQuaternion lhs, MyQuaternion rhs)
 	{
-		return new MyQuaternion(lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y, lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z, lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x, lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z);
+		return new MyQuaternion(lhs.w * rhs.x + lhs.x * rhs.w + lhs.y * rhs.z - lhs.z * rhs.y,
+								lhs.w * rhs.y + lhs.y * rhs.w + lhs.z * rhs.x - lhs.x * rhs.z,
+								lhs.w * rhs.z + lhs.z * rhs.w + lhs.x * rhs.y - lhs.y * rhs.x,
+								lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z);
 	}
+	/// <summary>
+	///rotar un punto, rota un punto con un quaternion, rota un vector con un quaternion.
+	///formula de matriz de rotacion x, y, z.
+	/// </summary>
 	public static Vector3 operator *(MyQuaternion rotation, Vector3 point)
 	{
 		float num = rotation.x * 2f;
@@ -650,18 +692,21 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		result.z = (num8 - num11) * point.x + (num9 + num10) * point.y + (1f - (num4 + num5)) * point.z;
 		return result;
 	}
+	/// <summary>
+	///Para saber que 2
+	/// </summary>
 	public static bool operator ==(MyQuaternion lhs, MyQuaternion rhs)
 	{
-		return MyQuaternion.Dot(lhs, rhs) > 0.999999f;
+		return Dot(lhs, rhs) > 0.999999f;
 	}
 	public static bool operator !=(MyQuaternion lhs, MyQuaternion rhs)
     {
-        return MyQuaternion.Dot(lhs, rhs) <= 0.999999f;
+        return Dot(lhs, rhs) <= 0.999999f;
 	}
 	#region Implicit conversions to and from Unity's Quaternion
-	public static implicit operator UnityEngine.Quaternion(MyQuaternion me)
+	public static implicit operator Quaternion(MyQuaternion me)
 	{
-		return new UnityEngine.Quaternion((float)me.x, (float)me.y, (float)me.z, (float)me.w);
+		return new Quaternion((float)me.x, (float)me.y, (float)me.z, (float)me.w);
 	}
 	public static implicit operator MyQuaternion(UnityEngine.Quaternion other)
 	{

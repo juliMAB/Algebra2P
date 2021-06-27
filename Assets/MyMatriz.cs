@@ -272,7 +272,7 @@ public struct MyMatriz
         }
     }
     // Resumen:
-    //     Devuelve el transpose de la matriz (Solo lectura). cambia las posiciones en la matrix.
+    //     Devuelve el transpose de la matriz. cambia las posiciones en la matrix.
     public MyMatriz transpose { get {
             MyMatriz res;
     res.m00 = m00;
@@ -294,288 +294,338 @@ public struct MyMatriz
             return res;
         }
     }
+
+    //
+    // Resumen:
+    //     Devuelve la rotacion de esta matrix.
+    public Quaternion rotation { get { return new Quaternion(m01,m11,m21,m31); } }
+
+    //
+    // Resumen:
+    //     Devuelve la escala de la matriz. (Read Only)
+    public Vector3 lossyScale { get { return new Vector3(m02, m12, m22); } }
+
+    //
+    // Resumen:
+    //     True si la matrix es identidad. (Read Only)
+    public bool isIdentity { get {return (identity==this); } }
+
+
+    // Resumen:
+    //     Setea una columna.
+    public void SetColumn(int index, Vector4 column) 
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            this[i,index] = column[i];
+        }
+    }
+
+    // Resumen:
+    //     Setea auna fila.
+    public void SetRow(int index, Vector4 row)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            this[index, i] = row[i];
+        }
+    }
+
+    //
+    // Resumen:
+    //      Setea la matrix trs()traslation,rotation,escala.
+    public void SetTRS(Vector3 pos, Quaternion q, Vector3 s)
+    {
+        
+    }
+
+    public static Vector4 operator *(MyMatriz lhs, Vector4 vector)
+    {
+        Vector4 res;
+        res.x = lhs.m00 * vector.x + lhs.m01 * vector.y + lhs.m02 * vector.z + lhs.m03 * vector.w;
+        res.y = lhs.m10 * vector.x + lhs.m11 * vector.y + lhs.m12 * vector.z + lhs.m13 * vector.w;
+        res.z = lhs.m20 * vector.x + lhs.m21 * vector.y + lhs.m22 * vector.z + lhs.m23 * vector.w;
+        res.w = lhs.m30 * vector.x + lhs.m31 * vector.y + lhs.m32 * vector.z + lhs.m33 * vector.w;
+        return res;
+    }
+
+    // Multiplies two matrices. Para no olvidarme como se multiplican matrices. se hace una linea recta y una linea horizontal.
+    public static MyMatriz operator *(MyMatriz lhs, MyMatriz rhs)
+    {
+        MyMatriz res;
+        res.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
+        res.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
+        res.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;
+        res.m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33;
+
+        res.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30;
+        res.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31;
+        res.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32;
+        res.m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33;
+
+        res.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30;
+        res.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31;
+        res.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32;
+        res.m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33;
+
+        res.m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30;
+        res.m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31;
+        res.m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32;
+        res.m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33;
+
+        return res;
+    }
+    public static bool operator ==(MyMatriz lhs, MyMatriz rhs)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (lhs[i] !=rhs[i])
+            {
+                return false;
+            }
+        }
+        return true;
+        
+    }
+    public static bool operator !=(MyMatriz lhs, MyMatriz rhs)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (lhs[i] != rhs[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 
 // Resumen:
 //     A standard 4x4 transformation matrix.
-public struct MyMatrix4x4
-{
+//public struct MyMatrix4x4
+//{
 
-    public float m00; //0.
-    public float m10; //1.
-    public float m20; //2.
-    public float m30; //3.
+//    public float m00; //0.
+//    public float m10; //1.
+//    public float m20; //2.
+//    public float m30; //3.
 
-    public float m01; //4.
-    public float m11; //5.
-    public float m21; //6.
-    public float m31; //7.
+//    public float m01; //4.
+//    public float m11; //5.
+//    public float m21; //6.
+//    public float m31; //7.
 
-    public float m02; //8.
-    public float m12; //9.
-    public float m22; //10.
-    public float m32; //11.
+//    public float m02; //8.
+//    public float m12; //9.
+//    public float m22; //10.
+//    public float m32; //11.
 
-    public float m03; //12.
-    public float m13; //13.
-    public float m23; //14.
-    public float m33; //15.
-
-
+//    public float m03; //12.
+//    public float m13; //13.
+//    public float m23; //14.
+//    public float m33; //15.
 
 
-    //
-    // Resumen:
-    //     Returns a matrix with all elements set to zero (Read Only).
-    public static Matrix4x4 zero { get; }
-    //
-    // Resumen:
-    //     Returns the identity matrix (Read Only).
-    public static Matrix4x4 identity { get; }
-    //
-    // Resumen:
-    //     Returns the transpose of this matrix (Read Only).
-    public Matrix4x4 transpose { get; }
-    //
-    // Resumen:
-    //     Attempts to get a rotation quaternion from this matrix.
-    public Quaternion rotation { get; }
-    //
-    // Resumen:
-    //     Attempts to get a scale value from the matrix. (Read Only)
-    public Vector3 lossyScale { get; }
-    //
-    // Resumen:
-    //     Checks whether this is an identity matrix. (Read Only)
-    public bool isIdentity { get; }
-    //
-    // Resumen:
-    //     The determinant of the matrix. (Read Only)
-    public float determinant { get; }
-    //
-    // Resumen:
-    //     This property takes a projection matrix and returns the six plane coordinates
-    //     that define a projection frustum.
-    public FrustumPlanes decomposeProjection { get; }
-    //
-    // Resumen:
-    //     The inverse of this matrix. (Read Only)
-    public Matrix4x4 inverse { get; }
 
-    public static float Determinant(Matrix4x4 m);
-    //
-    // Resumen:
-    //     This function returns a projection matrix with viewing frustum that has a near
-    //     plane defined by the coordinates that were passed in.
-    //
-    // Parámetros:
-    //   left:
-    //     The X coordinate of the left side of the near projection plane in view space.
-    //
-    //   right:
-    //     The X coordinate of the right side of the near projection plane in view space.
-    //
-    //   bottom:
-    //     The Y coordinate of the bottom side of the near projection plane in view space.
-    //
-    //   top:
-    //     The Y coordinate of the top side of the near projection plane in view space.
-    //
-    //   zNear:
-    //     Z distance to the near plane from the origin in view space.
-    //
-    //   zFar:
-    //     Z distance to the far plane from the origin in view space.
-    //
-    //   frustumPlanes:
-    //     Frustum planes struct that contains the view space coordinates of that define
-    //     a viewing frustum.
-    //
-    //   fp:
-    //
-    // Devuelve:
-    //     A projection matrix with a viewing frustum defined by the plane coordinates passed
-    //     in.
+
+//    //
+//    // Resumen:
+//    //     Returns a matrix with all elements set to zero (Read Only).
+//    public static Matrix4x4 zero { get; }
+//    //
+//    // Resumen:
+//    //     Returns the identity matrix (Read Only).
+//    public static Matrix4x4 identity { get; }
+//    //
+//    // Resumen:
+//    //     Returns the transpose of this matrix (Read Only).
+//    public Matrix4x4 transpose { get; }
+//    //
+//    // Resumen:
+//    //     Attempts to get a rotation quaternion from this matrix.
+//    public Quaternion rotation { get; }
+//    //
+//    // Resumen:
+//    //     Attempts to get a scale value from the matrix. (Read Only)
+//    public Vector3 lossyScale { get; }
+//    //
+//    // Resumen:
+//    //     Checks whether this is an identity matrix. (Read Only)
+//    public bool isIdentity { get; }
+//    //
+//    // Resumen:
+//    //     The determinant of the matrix. (Read Only)
+//    public float determinant { get; }
+//    //
+//    // Resumen:
+//    //     This property takes a projection matrix and returns the six plane coordinates
+//    //     that define a projection frustum.
+//    public FrustumPlanes decomposeProjection { get; }
+//    //
+//    // Resumen:
+//    //     The inverse of this matrix. (Read Only)
+//    public Matrix4x4 inverse { get; }
+
+//    public static float Determinant(Matrix4x4 m);
+//    //
+//    // Resumen:
+//    //     This function returns a projection matrix with viewing frustum that has a near
+//    //     plane defined by the coordinates that were passed in.
+//    //
+//    // Parámetros:
+//    //   left:
+//    //     The X coordinate of the left side of the near projection plane in view space.
+//    //
+//    //   right:
+//    //     The X coordinate of the right side of the near projection plane in view space.
+//    //
+//    //   bottom:
+//    //     The Y coordinate of the bottom side of the near projection plane in view space.
+//    //
+//    //   top:
+//    //     The Y coordinate of the top side of the near projection plane in view space.
+//    //
+//    //   zNear:
+//    //     Z distance to the near plane from the origin in view space.
+//    //
+//    //   zFar:
+//    //     Z distance to the far plane from the origin in view space.
+//    //
+//    //   frustumPlanes:
+//    //     Frustum planes struct that contains the view space coordinates of that define
+//    //     a viewing frustum.
+//    //
+//    //   fp:
+//    //
+//    // Devuelve:
+//    //     A projection matrix with a viewing frustum defined by the plane coordinates passed
+//    //     in.
     
-    public static Matrix4x4 Inverse(Matrix4x4 m);
-    public static bool Inverse3DAffine(Matrix4x4 input, ref Matrix4x4 result);
-    public static Matrix4x4 LookAt(Vector3 from, Vector3 to, Vector3 up);
-    //
-    // Resumen:
-    //     Create an orthogonal projection matrix.
-    //
-    // Parámetros:
-    //   left:
-    //     Left-side x-coordinate.
-    //
-    //   right:
-    //     Right-side x-coordinate.
-    //
-    //   bottom:
-    //     Bottom y-coordinate.
-    //
-    //   top:
-    //     Top y-coordinate.
-    //
-    //   zNear:
-    //     Near depth clipping plane value.
-    //
-    //   zFar:
-    //     Far depth clipping plane value.
-    //
-    // Devuelve:
-    //     The projection matrix.
-    public static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
-    //
-    // Resumen:
-    //     Create a perspective projection matrix.
-    //
-    // Parámetros:
-    //   fov:
-    //     Vertical field-of-view in degrees.
-    //
-    //   aspect:
-    //     Aspect ratio (width divided by height).
-    //
-    //   zNear:
-    //     Near depth clipping plane value.
-    //
-    //   zFar:
-    //     Far depth clipping plane value.
-    //
-    // Devuelve:
-    //     The projection matrix.
-    public static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar);
-    //
-    // Resumen:
-    //     Creates a rotation matrix.
-    //
-    // Parámetros:
-    //   q:
-    public static Matrix4x4 Rotate(Quaternion q);
-    //
-    // Resumen:
-    //     Creates a scaling matrix.
-    //
-    // Parámetros:
-    //   vector:
-    public static Matrix4x4 Scale(Vector3 vector);
-    //
-    // Resumen:
-    //     Creates a translation matrix.
-    //
-    // Parámetros:
-    //   vector:
-    public static Matrix4x4 Translate(Vector3 vector);
-    public static Matrix4x4 Transpose(Matrix4x4 m);
-    //
-    // Resumen:
-    //     Creates a translation, rotation and scaling matrix.
-    //
-    // Parámetros:
-    //   pos:
-    //
-    //   q:
-    //
-    //   s:
-    public static Matrix4x4 TRS(Vector3 pos, Quaternion q, Vector3 s);
-    public override bool Equals(object other);
-    public bool Equals(Matrix4x4 other);
-    //
-    // Resumen:
-    //     Get a column of the matrix.
-    //
-    // Parámetros:
-    //   index:
-    public Vector4 GetColumn(int index);
-    public override int GetHashCode();
-    //
-    // Resumen:
-    //     Returns a row of the matrix.
-    //
-    // Parámetros:
-    //   index:
-    public Vector4 GetRow(int index);
-    //
-    // Resumen:
-    //     Transforms a position by this matrix (generic).
-    //
-    // Parámetros:
-    //   point:
-    public Vector3 MultiplyPoint(Vector3 point);
-    //
-    // Resumen:
-    //     Transforms a position by this matrix (fast).
-    //
-    // Parámetros:
-    //   point:
-    public Vector3 MultiplyPoint3x4(Vector3 point);
-    //
-    // Resumen:
-    //     Transforms a direction by this matrix.
-    //
-    // Parámetros:
-    //   vector:
-    public Vector3 MultiplyVector(Vector3 vector);
-    //
-    // Resumen:
-    //     Sets a column of the matrix.
-    //
-    // Parámetros:
-    //   index:
-    //
-    //   column:
-    public void SetColumn(int index, Vector4 column);
-    //
-    // Resumen:
-    //     Sets a row of the matrix.
-    //
-    // Parámetros:
-    //   index:
-    //
-    //   row:
-    public void SetRow(int index, Vector4 row);
-    //
-    // Resumen:
-    //     Sets this matrix to a translation, rotation and scaling matrix.
-    //
-    // Parámetros:
-    //   pos:
-    //
-    //   q:
-    //
-    //   s:
-    public void SetTRS(Vector3 pos, Quaternion q, Vector3 s);
-    //
-    // Resumen:
-    //     Returns a nicely formatted string for this matrix.
-    //
-    // Parámetros:
-    //   format:
-    public override string ToString();
-    //
-    // Resumen:
-    //     Returns a nicely formatted string for this matrix.
-    //
-    // Parámetros:
-    //   format:
-    public string ToString(string format);
-    //
-    // Resumen:
-    //     Returns a plane that is transformed in space.
-    //
-    // Parámetros:
-    //   plane:
-    public Plane TransformPlane(Plane plane);
-    //
-    // Resumen:
-    //     Checks if this matrix is a valid transform matrix.
-    [ThreadSafe]
-    public bool ValidTRS();
+//    public static Matrix4x4 Inverse(Matrix4x4 m);
+//    public static bool Inverse3DAffine(Matrix4x4 input, ref Matrix4x4 result);
+//    public static Matrix4x4 LookAt(Vector3 from, Vector3 to, Vector3 up);
+//    //
+//    // Resumen:
+//    //     Create an orthogonal projection matrix.
+//    //
+//    // Parámetros:
+//    //   left:
+//    //     Left-side x-coordinate.
+//    //
+//    //   right:
+//    //     Right-side x-coordinate.
+//    //
+//    //   bottom:
+//    //     Bottom y-coordinate.
+//    //
+//    //   top:
+//    //     Top y-coordinate.
+//    //
+//    //   zNear:
+//    //     Near depth clipping plane value.
+//    //
+//    //   zFar:
+//    //     Far depth clipping plane value.
+//    //
+//    // Devuelve:
+//    //     The projection matrix.
+//    public static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
+//    //
+//    // Resumen:
+//    //     Create a perspective projection matrix.
+//    //
+//    // Parámetros:
+//    //   fov:
+//    //     Vertical field-of-view in degrees.
+//    //
+//    //   aspect:
+//    //     Aspect ratio (width divided by height).
+//    //
+//    //   zNear:
+//    //     Near depth clipping plane value.
+//    //
+//    //   zFar:
+//    //     Far depth clipping plane value.
+//    //
+//    // Devuelve:
+//    //     The projection matrix.
+//    public static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar);
+//    //
+//    // Resumen:
+//    //     Creates a rotation matrix.
+//    //
+//    // Parámetros:
+//    //   q:
+//    public static Matrix4x4 Rotate(Quaternion q);
+//    //
+//    // Resumen:
+//    //     Creates a scaling matrix.
+//    //
+//    // Parámetros:
+//    //   vector:
+//    public static Matrix4x4 Scale(Vector3 vector);
+//    //
+//    // Resumen:
+//    //     Creates a translation matrix.
+//    //
+//    // Parámetros:
+//    //   vector:
+//    public static Matrix4x4 Translate(Vector3 vector);
+//    public static Matrix4x4 Transpose(Matrix4x4 m);
+//    //
+//    // Resumen:
+//    //     Creates a translation, rotation and scaling matrix.
+//    //
+//    // Parámetros:
+//    //   pos:
+//    //
+//    //   q:
+//    //
+//    //   s:
+//    public static Matrix4x4 TRS(Vector3 pos, Quaternion q, Vector3 s);
+//    public override bool Equals(object other);
+//    public bool Equals(Matrix4x4 other);
+//    //
+//    // Resumen:
+//    //     Get a column of the matrix.
+//    //
+//    // Parámetros:
+//    //   index:
+//    public Vector4 GetColumn(int index);
+//    public override int GetHashCode();
+//    //
+//    // Resumen:
+//    //     Returns a row of the matrix.
+//    //
+//    // Parámetros:
+//    //   index:
+//    public Vector4 GetRow(int index);
+//    //
+//    // Resumen:
+//    //     Transforms a position by this matrix (generic).
+//    //
+//    // Parámetros:
+//    //   point:
+//    public Vector3 MultiplyPoint(Vector3 point);
+//    //
+//    // Resumen:
+//    //     Transforms a position by this matrix (fast).
+//    //
+//    // Parámetros:
+//    //   point:
+//    public Vector3 MultiplyPoint3x4(Vector3 point);
+//    //
+//    // Resumen:
+//    //     Transforms a direction by this matrix.
+//    //
+//    // Parámetros:
+//    //   vector:
+//    public Vector3 MultiplyVector(Vector3 vector);
 
-    public static Vector4 operator *(Matrix4x4 lhs, Vector4 vector);
-    public static Matrix4x4 operator *(Matrix4x4 lhs, Matrix4x4 rhs);
-    public static bool operator ==(Matrix4x4 lhs, Matrix4x4 rhs);
-    public static bool operator !=(Matrix4x4 lhs, Matrix4x4 rhs);
-}
+
+  
+
+
+
+//}
