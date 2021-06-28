@@ -344,135 +344,132 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	{
 		this = LookRotation(view, up);
 	}
-	/// <summary>
-	///   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is clamped to the range [0, 1].</para>
-	/// </summary>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
-	/// <param name="t"></param>
-	public static MyQuaternion Slerp(MyQuaternion a, MyQuaternion b, float t)
-	{
-		return Slerp(ref a, ref b, t);
-	}
-	private static MyQuaternion Slerp(ref MyQuaternion a, ref MyQuaternion b, float t)
-	{
-		if (t > 1) t = 1;
-		if (t < 0) t = 0;
-		return SlerpUnclamped(ref a, ref b, t);
-	}
-	/// <summary>
-	///   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is not clamped.</para>
-	/// </summary>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
-	/// <param name="t"></param>
-	public static MyQuaternion SlerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
-	{
-		return SlerpUnclamped(ref a, ref b, t);
-	}
-	private static MyQuaternion SlerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
-	{
-		// if either input is zero, return the other.
-		if (a.LengthSquared == 0.0f)
-		{
-			if (b.LengthSquared == 0.0f)
-			{
-				return identity;
-			}
-			return b;
-		}
-		else if (b.LengthSquared == 0.0f)
-		{
-			return a;
-		}
+    /// <summary>
+    ///   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is clamped to the range [0, 1].</para>
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="t"></param>
+    //public static MyQuaternion Slerp(MyQuaternion a, MyQuaternion b, float t)
+    //{
+    //	return Slerp(ref a, ref b, t);
+    //}
+    //private static MyQuaternion Slerp(ref MyQuaternion a, ref MyQuaternion b, float t)
+    //{
+    //	if (t > 1) t = 1;
+    //	if (t < 0) t = 0;
+    //	return SlerpUnclamped(ref a, ref b, t);
+    //}
+    ///// <summary>
+    /////   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is not clamped.</para>
+    ///// </summary>
+    ///// <param name="a"></param>
+    ///// <param name="b"></param>
+    ///// <param name="t"></param>
+    public static MyQuaternion SlerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
+    {
+        return SlerpUnclamped(ref a, ref b, t);
+    }
+    private static MyQuaternion SlerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
+    {
+        // if either input is zero, return the other.
+        if (a.LengthSquared == 0.0f)
+        {
+            if (b.LengthSquared == 0.0f)
+            {
+                return identity;
+            }
+            return b;
+        }
+        else if (b.LengthSquared == 0.0f)
+        {
+            return a;
+        }
 
 
-		float cosHalfAngle = a.w * b.w + Vector3.Dot(a.xyz, b.xyz);
+        float cosHalfAngle = a.w * b.w + Vector3.Dot(a.xyz, b.xyz);
 
-		if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
-		{
-			// angle = 0.0f, so just return one input.
-			return a;
-		}
-		else if (cosHalfAngle < 0.0f)
-		{
-			b.xyz = -b.xyz;
-			b.w = -b.w;
-			cosHalfAngle = -cosHalfAngle;
-		}
+        if (cosHalfAngle >= 1.0f || cosHalfAngle <= -1.0f)
+        {
+            // angle = 0.0f, so just return one input.
+            return a;
+        }
+        else if (cosHalfAngle < 0.0f)
+        {
+            b.xyz = -b.xyz;
+            b.w = -b.w;
+            cosHalfAngle = -cosHalfAngle;
+        }
 
-		float blendA;
-		float blendB;
-		if (cosHalfAngle < 0.99f)
-		{
-			// do proper slerp for big angles
-			float halfAngle = Mathf.Acos(cosHalfAngle);
-			float sinHalfAngle = Mathf.Sin(halfAngle);
-			float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-			blendA = Mathf.Sin(halfAngle * (1.0f - t)) * oneOverSinHalfAngle;
-			blendB = Mathf.Sin(halfAngle * t) * oneOverSinHalfAngle;
-		}
-		else
-		{
-			// do lerp if angle is really small.
-			blendA = 1.0f - t;
-			blendB = t;
-		}
+        float blendA;
+        float blendB;
+        if (cosHalfAngle < 0.99f)
+        {
+            // do proper slerp for big angles
+            float halfAngle = Mathf.Acos(cosHalfAngle);
+            float sinHalfAngle = Mathf.Sin(halfAngle);
+            float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
+            blendA = Mathf.Sin(halfAngle * (1.0f - t)) * oneOverSinHalfAngle;
+            blendB = Mathf.Sin(halfAngle * t) * oneOverSinHalfAngle;
+        }
+        else
+        {
+            // do lerp if angle is really small.
+            blendA = 1.0f - t;
+            blendB = t;
+        }
 
-		MyQuaternion result = new MyQuaternion(blendA * a.xyz + blendB * b.xyz, blendA * a.w + blendB * b.w);
-		if (result.LengthSquared > 0.0f)
-			return Normalize(result);
-		else
-			return identity;
-	}
-	/// <summary>
-	///   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is clamped to the range [0, 1].</para>
-	/// </summary>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
-	/// <param name="t"></param>
-	public static MyQuaternion Lerp(MyQuaternion a, MyQuaternion b, float t)
-	{
-		if (t > 1) t = 1;
-		if (t < 0) t = 0;
-		return Slerp(ref a, ref b, t); // TODO: use lerp not slerp, "Because quaternion works in 4D. Rotation in 4D are linear" ???
-	}
-	/// <summary>
-	///   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is not clamped.</para>
-	/// </summary>
-	/// <param name="a"></param>
-	/// <param name="b"></param>
-	/// <param name="t"></param>
-	public static MyQuaternion LerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
-	{
-		return LerpUnclamped(ref a, ref b, t);
-	}
-	private static MyQuaternion LerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
-	{
-		MyQuaternion q = new Quaternion(0, 0, 0, 0);
-		if (Dot(a, b) < 0)
-		{
-			q.x = a.x + t * (-b.x - a.x);
-			q.y = a.y + t * (-b.y - a.y);
-			q.z = a.z + t * (-b.z - a.z);
-			q.w = a.w + t * (-b.w - b.w);
-		}
-		else
-		{
-			q.x = a.x + t * (b.x - a.x);
-			q.y = a.y + t * (b.y - a.y);
-			q.z = a.z + t * (b.z - a.z);
-			q.w = a.w + t * (b.w - b.w);
-		}
-		return q.normalized;
-	}
-	/// <summary>
-	///   <para>Rotates a rotation /from/ towards /to/.</para>
-	/// </summary>
-	/// <param name="from"></param>
-	/// <param name="to"></param>
-	/// <param name="maxDegreesDelta"></param>
-	public static MyQuaternion RotateTowards(MyQuaternion from, MyQuaternion to, float maxDegreesDelta)
+        MyQuaternion result = new MyQuaternion(blendA * a.xyz + blendB * b.xyz, blendA * a.w + blendB * b.w);
+        if (result.LengthSquared > 0.0f)
+            return Normalize(result);
+        else
+            return identity;
+    }
+    ///// <summary>
+    /////   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is clamped to the range [0, 1].</para>
+    ///// </summary>
+    ///// <param name="a"></param>
+    ///// <param name="b"></param>
+    ///// <param name="t"></param>
+    //public static MyQuaternion Lerp(MyQuaternion a, MyQuaternion b, float t)
+    //{
+    //	if (t > 1) t = 1;
+    //	if (t < 0) t = 0;
+    //	return Slerp(ref a, ref b, t); // TODO: use lerp not slerp, "Because quaternion works in 4D. Rotation in 4D are linear" ???
+    //}
+    ///// <summary>
+    /////   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is not clamped.</para>
+    ///// </summary>
+    ///// <param name="a"></param>
+    ///// <param name="b"></param>
+    ///// <param name="t"></param>
+    //public static MyQuaternion LerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
+    //{
+    //	return LerpUnclamped(ref a, ref b, t);
+    //}
+    //private static MyQuaternion LerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
+    //{
+    //	MyQuaternion q = new Quaternion(0, 0, 0, 0);
+    //	if (Dot(a, b) < 0)
+    //	{
+    //		q.x = a.x + t * (-b.x - a.x);
+    //		q.y = a.y + t * (-b.y - a.y);
+    //		q.z = a.z + t * (-b.z - a.z);
+    //		q.w = a.w + t * (-b.w - b.w);
+    //	}
+    //	else
+    //	{
+    //		q.x = a.x + t * (b.x - a.x);
+    //		q.y = a.y + t * (b.y - a.y);
+    //		q.z = a.z + t * (b.z - a.z);
+    //		q.w = a.w + t * (b.w - b.w);
+    //	}
+    //	return q.normalized;
+    //}
+    /// <summary>
+    ///   te va a devolver la rotacion que se requiere para pasar de de from a to
+    /// </summary>
+    public static MyQuaternion RotateTowards(MyQuaternion from, MyQuaternion to, float maxDegreesDelta)
 	{
 		float num = MyQuaternion.Angle(from, to);
 		if (num == 0f)

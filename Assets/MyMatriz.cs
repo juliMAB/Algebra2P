@@ -558,14 +558,6 @@ public struct MyMatriz
             m[0, 1] * m[1, 0] * m[2, 2] * m[3, 3] + m[0, 0] * m[1, 1] * m[2, 2] * m[3, 3];
     }
     #endregion
-
-
-
-
-
-
-
-
 }
 //Constructor                           Listo
 //La mentira    (El get usando [])      Listo
