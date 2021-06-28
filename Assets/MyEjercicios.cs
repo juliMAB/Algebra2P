@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-
-
 namespace EjerciciosAlgebra
 {
-    public class EjerciciosQuaternion : MonoBehaviour
+    public class MyEjercicios : MonoBehaviour
     {
         public enum Ejercicio
         {
@@ -49,7 +47,7 @@ namespace EjerciciosAlgebra
                     VectorDebugger.EnableEditorView("V1");
                     List<Vector3> newPositions1 = new List<Vector3>();
                     for (int index = 0; index < VectorDebugger.GetVectorsPositions("V1").Count; ++index)
-                        newPositions1.Add(Quaternion.Euler(new Vector3(0.0f, angle, 0.0f)) * VectorDebugger.GetVectorsPositions("1")[index]);
+                        newPositions1.Add(Quaternion.Euler(new Vector3(0.0f, angle, 0.0f)) * VectorDebugger.GetVectorsPositions("V1")[index]);
                     VectorDebugger.UpdatePositionsSecuence("V1", newPositions1);
                     break;
                 case Ejercicio.Dos:
@@ -57,7 +55,7 @@ namespace EjerciciosAlgebra
                     VectorDebugger.EnableEditorView("V2");
                     List<Vector3> newPositions2 = new List<Vector3>();
                     for (int index = 0; index < VectorDebugger.GetVectorsPositions("V2").Count; ++index)
-                        newPositions2.Add((Quaternion.Euler(new Vector3(0.0f, angle, 0.0f))* VectorDebugger.GetVectorsPositions("2")[index]));
+                        newPositions2.Add((Quaternion.Euler(new Vector3(0.0f, angle, 0.0f))* VectorDebugger.GetVectorsPositions("V2")[index]));
                     VectorDebugger.UpdatePositionsSecuence("V2", newPositions2);
                     break;
                 case Ejercicio.Tres:
@@ -65,22 +63,13 @@ namespace EjerciciosAlgebra
                     VectorDebugger.EnableEditorView("V3");
                     List<Vector3> newPositions3 = new List<Vector3>();
                     newPositions3.Add(VectorDebugger.GetVectorsPositions("V3")[0]);
-                    newPositions3.Add((Quaternion.Euler(new Vector3(angle, angle, 0.0f))* VectorDebugger.GetVectorsPositions("3")[1]));
+                    newPositions3.Add((Quaternion.Euler(new Vector3(angle, angle, 0.0f))* VectorDebugger.GetVectorsPositions("V3")[1]));
                     newPositions3.Add(VectorDebugger.GetVectorsPositions("V3")[2]);
-                    newPositions3.Add((Quaternion.Euler(new Vector3(-angle, -angle, 0.0f))* VectorDebugger.GetVectorsPositions("3")[3]));
+                    newPositions3.Add((Quaternion.Euler(new Vector3(-angle, -angle, 0.0f))* VectorDebugger.GetVectorsPositions("V3")[3]));
                     newPositions3.Add(VectorDebugger.GetVectorsPositions("V3")[4]);
                     VectorDebugger.UpdatePositionsSecuence("V3", newPositions3);
                     break;
             }
         }
-
-
-        private void TurnOn(string id)
-        {
-            VectorDebugger.TurnOnVector(id);
-            VectorDebugger.EnableEditorView(id);
-        }
-
-        
     }
 }

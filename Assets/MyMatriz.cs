@@ -4,7 +4,7 @@ using UnityEngine;
 
 public struct MyMatriz
 {
-
+    #region Variable
     public float m00; //0.
     public float m10; //1.
     public float m20; //2.
@@ -25,9 +25,15 @@ public struct MyMatriz
     public float m23; //14.
     public float m33; //15.
 
-
-
-
+    public MyMatriz transpose
+    {
+        get
+        {
+            return Transpose(this);
+        }
+    }
+    #endregion
+    #region construction
     public MyMatriz(Vector4 column0, Vector4 column1, Vector4 column2, Vector4 column3)
     {
         m00 = column0.x; m01 = column1.x; m02 = column2.x; m03 = column3.x;
@@ -36,28 +42,113 @@ public struct MyMatriz
         m30 = column0.w; m31 = column1.w; m32 = column2.w; m33 = column3.w;
         return;
     }
-	public float this[int index]
-	{
-		get
-		{
+    #endregion
+    #region operators
+    public static Vector4 operator *(MyMatriz lhs, Vector4 vector)
+    {
+        Vector4 res;
+        res.x = lhs.m00 * vector.x + lhs.m01 * vector.y + lhs.m02 * vector.z + lhs.m03 * vector.w;
+        res.y = lhs.m10 * vector.x + lhs.m11 * vector.y + lhs.m12 * vector.z + lhs.m13 * vector.w;
+        res.z = lhs.m20 * vector.x + lhs.m21 * vector.y + lhs.m22 * vector.z + lhs.m23 * vector.w;
+        res.w = lhs.m30 * vector.x + lhs.m31 * vector.y + lhs.m32 * vector.z + lhs.m33 * vector.w;
+        return res;
+    }
+    // Multiplies two matrices. Para no olvidarme como se multiplican matrices. se hace una linea recta y una linea horizontal.
+    public static MyMatriz operator *(MyMatriz lhs, MyMatriz rhs)
+    {
+        MyMatriz res;
+        res.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
+        res.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
+        res.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;
+        res.m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33;
+
+        res.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30;
+        res.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31;
+        res.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32;
+        res.m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33;
+
+        res.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30;
+        res.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31;
+        res.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32;
+        res.m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33;
+
+        res.m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30;
+        res.m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31;
+        res.m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32;
+        res.m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33;
+
+        return res;
+    }
+    public static bool operator ==(MyMatriz lhs, MyMatriz rhs)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (lhs[i] != rhs[i])
+            {
+                return false;
+            }
+        }
+        return true;
+
+    }
+    public static bool operator !=(MyMatriz lhs, MyMatriz rhs)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            if (lhs[i] != rhs[i])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    public override bool Equals(object other)
+    {
+        if (!(other is MyMatriz))
+            return false;
+        MyMatriz matrix4x4 = (MyMatriz)other;
+        if (this.GetColumn(0).Equals((object)matrix4x4.GetColumn(0)) && this.GetColumn(1).Equals((object)matrix4x4.GetColumn(1)) && this.GetColumn(2).Equals((object)matrix4x4.GetColumn(2)))
+            return this.GetColumn(3).Equals((object)matrix4x4.GetColumn(3));
+        return false;
+    }
+
+    public static implicit operator MyMatriz(Matrix4x4 m)
+    {
+        MyMatriz myM = zero;
+        for (int i = 0; i < 16; i++)
+        {
+            myM[i] = m[i];
+        }
+        return myM;
+    }
+    #endregion
+    #region getters
+    public Vector4 GetColumn(int i)
+    {
+        return new Vector4(this[0, i], this[1, i], this[2, i], this[3, i]);
+    }
+    public float this[int index]
+    {
+        get
+        {
             switch (index)
-			{
-				case 0:
-					return this.m00;
-				case 1:
-					return this.m10;
-				case 2:
-					return this.m20;
-				case 3:
-					return this.m30;
-				case 4:
-					return this.m01;
-				case 5:
-					return this.m11;
-				case 6:
-					return this.m21;
-				case 7:
-					return this.m31;
+            {
+                case 0:
+                    return this.m00;
+                case 1:
+                    return this.m10;
+                case 2:
+                    return this.m20;
+                case 3:
+                    return this.m30;
+                case 4:
+                    return this.m01;
+                case 5:
+                    return this.m11;
+                case 6:
+                    return this.m21;
+                case 7:
+                    return this.m31;
                 case 8:
                     return this.m02;
                 case 9:
@@ -75,13 +166,13 @@ public struct MyMatriz
                 case 15:
                     return this.m33;
                 default:
-					throw new IndexOutOfRangeException("Invalid index: " + index + ", can use only 0-15");
-			}
-		}
-		set
-		{
-			switch (index)
-			{
+                    throw new IndexOutOfRangeException("Invalid index: " + index + ", can use only 0-15");
+            }
+        }
+        set
+        {
+            switch (index)
+            {
                 case 0:
                     this.m00 = value; break;
                 case 1:
@@ -117,15 +208,16 @@ public struct MyMatriz
                 default:
                     throw new IndexOutOfRangeException("Invalid index: " + index + ", can use only 0-15");
             }
-		}
-	}
-    public float this[int row, int column] {
+        }
+    }
+    public float this[int row, int column]
+    {
         get
         {
             switch (row)
             {
                 case 0:
-                    switch(column)
+                    switch (column)
                     {
                         case 0:
                             return this.m00;
@@ -254,15 +346,16 @@ public struct MyMatriz
         }
     }
 
-    //
-    // Resumen:
-    //     Devuelve una matriz con todos los elementos seteados en cero (Solo de lectura).
+    /// <summary>
+    /// Resumen:Devuelve una matriz con todos los elementos en cero (Solo de lectura).
+    /// </summary>    
     public static MyMatriz zero { get { return new MyMatriz(Vector4.zero, Vector4.zero, Vector4.zero, Vector4.zero); } }
-    //
-    // Resumen:
-    //     Devuelve la identidad de la matriz osea con la franja de 1 al medio (Solo de lectura).
-    public static MyMatriz identity 
-    { get
+    /// <summary>
+    ///  Resumen: Devuelve la identidad de la matriz osea con la franja de 1 al medio (Solo de lectura).
+    /// </summary>
+    public static MyMatriz identity
+    {
+        get
         {
             return new MyMatriz(
           new Vector4(1, 0, 0, 0),
@@ -271,53 +364,14 @@ public struct MyMatriz
           new Vector4(0, 0, 0, 1));
         }
     }
-    // Resumen:
-    //     Devuelve el transpose de la matriz. cambia las posiciones en la matrix.
-    public MyMatriz transpose { get {
-            MyMatriz res;
-    res.m00 = m00;
-    res.m10 = m01;
-    res.m20 = m02;
-    res.m30 = m03;
-    res.m01 = m10;
-    res.m11 = m11;
-    res.m21 = m12;
-    res.m31 = m13;
-    res.m02 = m20;
-    res.m12 = m21;
-    res.m22 = m22;
-    res.m32 = m23;
-    res.m03 = m30;
-    res.m13 = m31;
-    res.m23 = m32;
-    res.m33 = m33;
-            return res;
-        }
-    }
-
-    //
-    // Resumen:
-    //     Devuelve la rotacion de esta matrix.
-    public Quaternion rotation { get { return new Quaternion(m01,m11,m21,m31); } }
-
-    //
-    // Resumen:
-    //     Devuelve la escala de la matriz. (Read Only)
-    public Vector3 lossyScale { get { return new Vector3(m02, m12, m22); } }
-
-    //
-    // Resumen:
-    //     True si la matrix es identidad. (Read Only)
-    public bool isIdentity { get {return (identity==this); } }
-
 
     // Resumen:
     //     Setea una columna.
-    public void SetColumn(int index, Vector4 column) 
+    public void SetColumn(int index, Vector4 column)
     {
         for (int i = 0; i < 4; i++)
         {
-            this[i,index] = column[i];
+            this[i, index] = column[i];
         }
     }
 
@@ -330,302 +384,135 @@ public struct MyMatriz
             this[index, i] = row[i];
         }
     }
-
-    //
-    // Resumen:
-    //      Setea la matrix trs()traslation,rotation,escala.
-    public void SetTRS(Vector3 pos, Quaternion q, Vector3 s)
+    #endregion
+    #region funciones
+    public static MyMatriz Transpose(MyMatriz m)
     {
-        
-    }
-
-    public static Vector4 operator *(MyMatriz lhs, Vector4 vector)
-    {
-        Vector4 res;
-        res.x = lhs.m00 * vector.x + lhs.m01 * vector.y + lhs.m02 * vector.z + lhs.m03 * vector.w;
-        res.y = lhs.m10 * vector.x + lhs.m11 * vector.y + lhs.m12 * vector.z + lhs.m13 * vector.w;
-        res.z = lhs.m20 * vector.x + lhs.m21 * vector.y + lhs.m22 * vector.z + lhs.m23 * vector.w;
-        res.w = lhs.m30 * vector.x + lhs.m31 * vector.y + lhs.m32 * vector.z + lhs.m33 * vector.w;
-        return res;
-    }
-
-    // Multiplies two matrices. Para no olvidarme como se multiplican matrices. se hace una linea recta y una linea horizontal.
-    public static MyMatriz operator *(MyMatriz lhs, MyMatriz rhs)
-    {
-        MyMatriz res;
-        res.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
-        res.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
-        res.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;
-        res.m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33;
-
-        res.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30;
-        res.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31;
-        res.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32;
-        res.m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33;
-
-        res.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30;
-        res.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31;
-        res.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32;
-        res.m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33;
-
-        res.m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30;
-        res.m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31;
-        res.m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32;
-        res.m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33;
-
-        return res;
-    }
-    public static bool operator ==(MyMatriz lhs, MyMatriz rhs)
-    {
-        for (int i = 0; i < 16; i++)
+        return new MyMatriz()
         {
-            if (lhs[i] !=rhs[i])
-            {
-                return false;
-            }
-        }
-        return true;
-        
+            m00 = m.m00,
+            m01 = m.m10,
+            m02 = m.m20,
+            m03 = m.m30,
+            m10 = m.m01,
+            m11 = m.m11,
+            m12 = m.m21,
+            m13 = m.m31,
+            m20 = m.m02,
+            m21 = m.m12,
+            m22 = m.m22,
+            m23 = m.m32,
+            m30 = m.m03,
+            m31 = m.m13,
+            m32 = m.m23,
+            m33 = m.m33
+        };
     }
-    public static bool operator !=(MyMatriz lhs, MyMatriz rhs)
+    public static MyMatriz Translate(Vector3 v)
     {
-        for (int i = 0; i < 16; i++)
+        return new MyMatriz()
         {
-            if (lhs[i] != rhs[i])
-            {
-                return true;
-            }
-        }
-        return false;
+            m00 = 0.0f,
+            m01 = 0.0f,
+            m02 = 0.0f,
+            m03 = v.x,
+            m10 = 0.0f,
+            m11 = 0.0f,
+            m12 = 0.0f,
+            m13 = v.y,
+            m20 = 0.0f,
+            m21 = 0.0f,
+            m22 = 0.0f,
+            m23 = v.z,
+            m30 = 0.0f,
+            m31 = 0.0f,
+            m32 = 0.0f,
+            m33 = 0.0f
+        };
     }
-}
+    public static MyMatriz Rotate(Quaternion q)
+    {
+        float num1 = q.x * 2f;
+        float num2 = q.y * 2f;
+        float num3 = q.z * 2f;
+        float num4 = q.x * num1;
+        float num5 = q.y * num2;
+        float num6 = q.z * num3;
+        float num7 = q.x * num2;
+        float num8 = q.x * num3;
+        float num9 = q.y * num3;
+        float num10 = q.w * num1;
+        float num11 = q.w * num2;
+        float num12 = q.w * num3;
+        MyMatriz matrix4x4;
+        matrix4x4.m00 = (float)(1.0 - ((double)num5 + (double)num6));
+        matrix4x4.m10 = num7 + num12;
+        matrix4x4.m20 = num8 - num11;
+        matrix4x4.m30 = 0.0f;
+        matrix4x4.m01 = num7 - num12;
+        matrix4x4.m11 = (float)(1.0 - ((double)num4 + (double)num6));
+        matrix4x4.m21 = num9 + num10;
+        matrix4x4.m31 = 0.0f;
+        matrix4x4.m02 = num8 + num11;
+        matrix4x4.m12 = num9 - num10;
+        matrix4x4.m22 = (float)(1.0 - ((double)num4 + (double)num5));
+        matrix4x4.m32 = 0.0f;
+        matrix4x4.m03 = 0.0f;
+        matrix4x4.m13 = 0.0f;
+        matrix4x4.m23 = 0.0f;
+        matrix4x4.m33 = 1f;
+        return matrix4x4;
+    }
+    public static MyMatriz Scale(Vector3 v)
+    {
+        return new MyMatriz()
+        {
+            m00 = v.x,
+            m01 = 0.0f,
+            m02 = 0.0f,
+            m03 = 0.0f,
+            m10 = 0.0f,
+            m11 = v.y,
+            m12 = 0.0f,
+            m13 = 0.0f,
+            m20 = 0.0f,
+            m21 = 0.0f,
+            m22 = v.z,
+            m23 = 0.0f,
+            m30 = 0.0f,
+            m31 = 0.0f,
+            m32 = 0.0f,
+            m33 = 1f
+        };
+    }
+    public MyMatriz TRS(Vector3 pos, Quaternion q, Vector3 s)
+    {
+        return ((Translate(pos)) * (Rotate(q)) * Scale(s));
+    }
+    #endregion
 
 
-// Resumen:
-//     A standard 4x4 transformation matrix.
-//public struct MyMatrix4x4
-//{
-
-//    public float m00; //0.
-//    public float m10; //1.
-//    public float m20; //2.
-//    public float m30; //3.
-
-//    public float m01; //4.
-//    public float m11; //5.
-//    public float m21; //6.
-//    public float m31; //7.
-
-//    public float m02; //8.
-//    public float m12; //9.
-//    public float m22; //10.
-//    public float m32; //11.
-
-//    public float m03; //12.
-//    public float m13; //13.
-//    public float m23; //14.
-//    public float m33; //15.
 
 
 
-
-//    //
-//    // Resumen:
-//    //     Returns a matrix with all elements set to zero (Read Only).
-//    public static Matrix4x4 zero { get; }
-//    //
-//    // Resumen:
-//    //     Returns the identity matrix (Read Only).
-//    public static Matrix4x4 identity { get; }
-//    //
-//    // Resumen:
-//    //     Returns the transpose of this matrix (Read Only).
-//    public Matrix4x4 transpose { get; }
-//    //
-//    // Resumen:
-//    //     Attempts to get a rotation quaternion from this matrix.
-//    public Quaternion rotation { get; }
-//    //
-//    // Resumen:
-//    //     Attempts to get a scale value from the matrix. (Read Only)
-//    public Vector3 lossyScale { get; }
-//    //
-//    // Resumen:
-//    //     Checks whether this is an identity matrix. (Read Only)
-//    public bool isIdentity { get; }
-//    //
-//    // Resumen:
-//    //     The determinant of the matrix. (Read Only)
-//    public float determinant { get; }
-//    //
-//    // Resumen:
-//    //     This property takes a projection matrix and returns the six plane coordinates
-//    //     that define a projection frustum.
-//    public FrustumPlanes decomposeProjection { get; }
-//    //
-//    // Resumen:
-//    //     The inverse of this matrix. (Read Only)
-//    public Matrix4x4 inverse { get; }
-
-//    public static float Determinant(Matrix4x4 m);
-//    //
-//    // Resumen:
-//    //     This function returns a projection matrix with viewing frustum that has a near
-//    //     plane defined by the coordinates that were passed in.
-//    //
-//    // Parámetros:
-//    //   left:
-//    //     The X coordinate of the left side of the near projection plane in view space.
-//    //
-//    //   right:
-//    //     The X coordinate of the right side of the near projection plane in view space.
-//    //
-//    //   bottom:
-//    //     The Y coordinate of the bottom side of the near projection plane in view space.
-//    //
-//    //   top:
-//    //     The Y coordinate of the top side of the near projection plane in view space.
-//    //
-//    //   zNear:
-//    //     Z distance to the near plane from the origin in view space.
-//    //
-//    //   zFar:
-//    //     Z distance to the far plane from the origin in view space.
-//    //
-//    //   frustumPlanes:
-//    //     Frustum planes struct that contains the view space coordinates of that define
-//    //     a viewing frustum.
-//    //
-//    //   fp:
-//    //
-//    // Devuelve:
-//    //     A projection matrix with a viewing frustum defined by the plane coordinates passed
-//    //     in.
     
-//    public static Matrix4x4 Inverse(Matrix4x4 m);
-//    public static bool Inverse3DAffine(Matrix4x4 input, ref Matrix4x4 result);
-//    public static Matrix4x4 LookAt(Vector3 from, Vector3 to, Vector3 up);
-//    //
-//    // Resumen:
-//    //     Create an orthogonal projection matrix.
-//    //
-//    // Parámetros:
-//    //   left:
-//    //     Left-side x-coordinate.
-//    //
-//    //   right:
-//    //     Right-side x-coordinate.
-//    //
-//    //   bottom:
-//    //     Bottom y-coordinate.
-//    //
-//    //   top:
-//    //     Top y-coordinate.
-//    //
-//    //   zNear:
-//    //     Near depth clipping plane value.
-//    //
-//    //   zFar:
-//    //     Far depth clipping plane value.
-//    //
-//    // Devuelve:
-//    //     The projection matrix.
-//    public static Matrix4x4 Ortho(float left, float right, float bottom, float top, float zNear, float zFar);
-//    //
-//    // Resumen:
-//    //     Create a perspective projection matrix.
-//    //
-//    // Parámetros:
-//    //   fov:
-//    //     Vertical field-of-view in degrees.
-//    //
-//    //   aspect:
-//    //     Aspect ratio (width divided by height).
-//    //
-//    //   zNear:
-//    //     Near depth clipping plane value.
-//    //
-//    //   zFar:
-//    //     Far depth clipping plane value.
-//    //
-//    // Devuelve:
-//    //     The projection matrix.
-//    public static Matrix4x4 Perspective(float fov, float aspect, float zNear, float zFar);
-//    //
-//    // Resumen:
-//    //     Creates a rotation matrix.
-//    //
-//    // Parámetros:
-//    //   q:
-//    public static Matrix4x4 Rotate(Quaternion q);
-//    //
-//    // Resumen:
-//    //     Creates a scaling matrix.
-//    //
-//    // Parámetros:
-//    //   vector:
-//    public static Matrix4x4 Scale(Vector3 vector);
-//    //
-//    // Resumen:
-//    //     Creates a translation matrix.
-//    //
-//    // Parámetros:
-//    //   vector:
-//    public static Matrix4x4 Translate(Vector3 vector);
-//    public static Matrix4x4 Transpose(Matrix4x4 m);
-//    //
-//    // Resumen:
-//    //     Creates a translation, rotation and scaling matrix.
-//    //
-//    // Parámetros:
-//    //   pos:
-//    //
-//    //   q:
-//    //
-//    //   s:
-//    public static Matrix4x4 TRS(Vector3 pos, Quaternion q, Vector3 s);
-//    public override bool Equals(object other);
-//    public bool Equals(Matrix4x4 other);
-//    //
-//    // Resumen:
-//    //     Get a column of the matrix.
-//    //
-//    // Parámetros:
-//    //   index:
-//    public Vector4 GetColumn(int index);
-//    public override int GetHashCode();
-//    //
-//    // Resumen:
-//    //     Returns a row of the matrix.
-//    //
-//    // Parámetros:
-//    //   index:
-//    public Vector4 GetRow(int index);
-//    //
-//    // Resumen:
-//    //     Transforms a position by this matrix (generic).
-//    //
-//    // Parámetros:
-//    //   point:
-//    public Vector3 MultiplyPoint(Vector3 point);
-//    //
-//    // Resumen:
-//    //     Transforms a position by this matrix (fast).
-//    //
-//    // Parámetros:
-//    //   point:
-//    public Vector3 MultiplyPoint3x4(Vector3 point);
-//    //
-//    // Resumen:
-//    //     Transforms a direction by this matrix.
-//    //
-//    // Parámetros:
-//    //   vector:
-//    public Vector3 MultiplyVector(Vector3 vector);
+    
 
+}
+//Constructor                           Listo
+//La mentira    (El get usando [])      Listo
+//Mat identidad                         Listo
+//Mat zero                              Listo
+//Matriz transpose    (Propierty)       Listo
+//Matriz rotation                       Listo
+//Matriz lossyScanel                    
+//Mat inverse                           
+//Rot transf y scale
+//TRS                                   Listo
+//Transpose                             Listo
+//Equals                                Listo
+//Get Row                               Listo
 
-  
+//Set colum Set row Set trs             Listo
+//Y operadores                          Listo
 
-
-
-//}

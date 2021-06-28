@@ -15,7 +15,7 @@ public class rotarcubito : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            transform.rotation.To;
+            //transform.rotation.To;
             //print(a[1]);
             //print(b[1]);
             //print(a.eulerAngles);

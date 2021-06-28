@@ -352,7 +352,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="t"></param>
 	public static MyQuaternion Slerp(MyQuaternion a, MyQuaternion b, float t)
 	{
-		return MyQuaternion.Slerp(ref a, ref b, t);
+		return Slerp(ref a, ref b, t);
 	}
 	private static MyQuaternion Slerp(ref MyQuaternion a, ref MyQuaternion b, float t)
 	{
@@ -368,7 +368,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="t"></param>
 	public static MyQuaternion SlerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
 	{
-		return MyQuaternion.SlerpUnclamped(ref a, ref b, t);
+		return SlerpUnclamped(ref a, ref b, t);
 	}
 	private static MyQuaternion SlerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
 	{
@@ -406,11 +406,11 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		if (cosHalfAngle < 0.99f)
 		{
 			// do proper slerp for big angles
-			float halfAngle = (float)System.Math.Acos(cosHalfAngle);
-			float sinHalfAngle = (float)System.Math.Sin(halfAngle);
+			float halfAngle = Mathf.Acos(cosHalfAngle);
+			float sinHalfAngle = Mathf.Sin(halfAngle);
 			float oneOverSinHalfAngle = 1.0f / sinHalfAngle;
-			blendA = (float)System.Math.Sin(halfAngle * (1.0f - t)) * oneOverSinHalfAngle;
-			blendB = (float)System.Math.Sin(halfAngle * t) * oneOverSinHalfAngle;
+			blendA = Mathf.Sin(halfAngle * (1.0f - t)) * oneOverSinHalfAngle;
+			blendB = Mathf.Sin(halfAngle * t) * oneOverSinHalfAngle;
 		}
 		else
 		{
@@ -445,7 +445,26 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="t"></param>
 	public static MyQuaternion LerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
 	{
-		return Slerp(ref a, ref b, t);
+		return LerpUnclamped(ref a, ref b, t);
+	}
+	private static MyQuaternion LerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
+	{
+		MyQuaternion q = new Quaternion(0, 0, 0, 0);
+		if (Dot(a, b) < 0)
+		{
+			q.x = a.x + t * (-b.x - a.x);
+			q.y = a.y + t * (-b.y - a.y);
+			q.z = a.z + t * (-b.z - a.z);
+			q.w = a.w + t * (-b.w - b.w);
+		}
+		else
+		{
+			q.x = a.x + t * (b.x - a.x);
+			q.y = a.y + t * (b.y - a.y);
+			q.z = a.z + t * (b.z - a.z);
+			q.w = a.w + t * (b.w - b.w);
+		}
+		return q.normalized;
 	}
 	/// <summary>
 	///   <para>Rotates a rotation /from/ towards /to/.</para>
@@ -626,10 +645,12 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		}
 	}
 
-	/// <summary>
-	///Es como la ide del objeto.
-	/// </summary>
-	public override int GetHashCode()
+    #region operators
+
+    /// <summary>
+    ///Es como la ide del objeto.
+    /// </summary>
+    public override int GetHashCode()
 	{
 		return x.GetHashCode() ^ y.GetHashCode() << 2 ^ z.GetHashCode() >> 2 ^ w.GetHashCode() >> 1;
 	}
@@ -669,7 +690,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 								lhs.w * rhs.w - lhs.x * rhs.x - lhs.y * rhs.y - lhs.z * rhs.z);
 	}
 	/// <summary>
-	///rotar un punto, rota un punto con un quaternion, rota un vector con un quaternion.
+	///devuelve un punto rotado, rota un punto con un quaternion, rota un vector con un quaternion.
 	///formula de matriz de rotacion x, y, z.
 	/// </summary>
 	public static Vector3 operator *(MyQuaternion rotation, Vector3 point)
@@ -693,7 +714,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		return result;
 	}
 	/// <summary>
-	///Para saber que 2
+	///el producto escalar es que tantas veces tengo que sumar uno para que me de el otro, por lo tanto cuando es 1 son iguales y el 0.999 es por el margen de error.
 	/// </summary>
 	public static bool operator ==(MyQuaternion lhs, MyQuaternion rhs)
 	{
@@ -712,6 +733,8 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	{
 		return new MyQuaternion((float)other.x, (float)other.y, (float)other.z, (float)other.w);
 	}
-	#endregion
+    #endregion
+
+    #endregion
 }
 
