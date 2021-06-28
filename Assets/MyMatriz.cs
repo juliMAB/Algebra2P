@@ -489,14 +489,82 @@ public struct MyMatriz
     {
         return ((Translate(pos)) * (Rotate(q)) * Scale(s));
     }
+    public static MyMatriz Inverse(MyMatriz matrix)
+    {
+        float detA = Determinant(matrix);
+        if (detA == 0)
+            return MyMatriz.identity;
+
+        MyMatriz tempMatrix = new MyMatriz()
+        {
+            //------0---------
+            m00 = matrix.m11 * matrix.m22 * matrix.m33 + matrix.m12 * matrix.m23 * matrix.m31 + matrix.m13 * matrix.m21 * matrix.m32 - matrix.m11 * matrix.m23 * matrix.m32 - matrix.m12 * matrix.m21 * matrix.m33 - matrix.m13 * matrix.m22 * matrix.m31,
+            m01 = matrix.m01 * matrix.m23 * matrix.m32 + matrix.m02 * matrix.m21 * matrix.m33 + matrix.m03 * matrix.m22 * matrix.m31 - matrix.m01 * matrix.m22 * matrix.m33 - matrix.m02 * matrix.m23 * matrix.m31 - matrix.m03 * matrix.m21 * matrix.m32,
+            m02 = matrix.m01 * matrix.m12 * matrix.m33 + matrix.m02 * matrix.m13 * matrix.m32 + matrix.m03 * matrix.m11 * matrix.m32 - matrix.m01 * matrix.m13 * matrix.m32 - matrix.m02 * matrix.m11 * matrix.m33 - matrix.m03 * matrix.m12 * matrix.m31,
+            m03 = matrix.m01 * matrix.m13 * matrix.m22 + matrix.m02 * matrix.m11 * matrix.m23 + matrix.m03 * matrix.m12 * matrix.m21 - matrix.m01 * matrix.m12 * matrix.m23 - matrix.m02 * matrix.m13 * matrix.m21 - matrix.m03 * matrix.m11 * matrix.m22,
+            //-------1--------					     								    
+            m10 = matrix.m10 * matrix.m23 * matrix.m32 + matrix.m12 * matrix.m20 * matrix.m33 + matrix.m13 * matrix.m22 * matrix.m30 - matrix.m10 * matrix.m22 * matrix.m33 - matrix.m12 * matrix.m23 * matrix.m30 - matrix.m13 * matrix.m20 * matrix.m32,
+            m11 = matrix.m00 * matrix.m22 * matrix.m33 + matrix.m02 * matrix.m23 * matrix.m30 + matrix.m03 * matrix.m20 * matrix.m32 - matrix.m00 * matrix.m23 * matrix.m32 - matrix.m02 * matrix.m20 * matrix.m33 - matrix.m03 * matrix.m22 * matrix.m30,
+            m12 = matrix.m00 * matrix.m13 * matrix.m32 + matrix.m02 * matrix.m10 * matrix.m33 + matrix.m03 * matrix.m12 * matrix.m30 - matrix.m00 * matrix.m12 * matrix.m33 - matrix.m02 * matrix.m13 * matrix.m30 - matrix.m03 * matrix.m10 * matrix.m32,
+            m13 = matrix.m00 * matrix.m12 * matrix.m23 + matrix.m02 * matrix.m13 * matrix.m20 + matrix.m03 * matrix.m10 * matrix.m22 - matrix.m00 * matrix.m13 * matrix.m22 - matrix.m02 * matrix.m10 * matrix.m23 - matrix.m03 * matrix.m12 * matrix.m20,
+            //-------2--------					     								    
+            m20 = matrix.m10 * matrix.m21 * matrix.m33 + matrix.m11 * matrix.m23 * matrix.m30 + matrix.m13 * matrix.m20 * matrix.m31 - matrix.m10 * matrix.m23 * matrix.m31 - matrix.m11 * matrix.m20 * matrix.m33 - matrix.m13 * matrix.m31 * matrix.m30,
+            m21 = matrix.m00 * matrix.m23 * matrix.m31 + matrix.m01 * matrix.m20 * matrix.m33 + matrix.m03 * matrix.m21 * matrix.m30 - matrix.m00 * matrix.m21 * matrix.m33 - matrix.m01 * matrix.m23 * matrix.m30 - matrix.m03 * matrix.m20 * matrix.m31,
+            m22 = matrix.m00 * matrix.m11 * matrix.m33 + matrix.m01 * matrix.m13 * matrix.m31 + matrix.m03 * matrix.m10 * matrix.m31 - matrix.m00 * matrix.m13 * matrix.m31 - matrix.m01 * matrix.m10 * matrix.m33 - matrix.m03 * matrix.m11 * matrix.m30,
+            m23 = matrix.m00 * matrix.m13 * matrix.m21 + matrix.m01 * matrix.m10 * matrix.m23 + matrix.m03 * matrix.m11 * matrix.m31 - matrix.m00 * matrix.m11 * matrix.m23 - matrix.m01 * matrix.m13 * matrix.m20 - matrix.m03 * matrix.m10 * matrix.m21,
+            //------3---------					     								    
+            m30 = matrix.m10 * matrix.m22 * matrix.m31 + matrix.m11 * matrix.m20 * matrix.m32 + matrix.m12 * matrix.m21 * matrix.m30 - matrix.m00 * matrix.m21 * matrix.m32 - matrix.m11 * matrix.m22 * matrix.m30 - matrix.m12 * matrix.m20 * matrix.m31,
+            m31 = matrix.m00 * matrix.m21 * matrix.m32 + matrix.m01 * matrix.m22 * matrix.m30 + matrix.m02 * matrix.m20 * matrix.m31 - matrix.m00 * matrix.m22 * matrix.m31 - matrix.m01 * matrix.m20 * matrix.m32 - matrix.m02 * matrix.m21 * matrix.m30,
+            m32 = matrix.m00 * matrix.m12 * matrix.m31 + matrix.m01 * matrix.m10 * matrix.m32 + matrix.m02 * matrix.m11 * matrix.m30 - matrix.m00 * matrix.m11 * matrix.m32 - matrix.m01 * matrix.m12 * matrix.m30 - matrix.m02 * matrix.m10 * matrix.m31,
+            m33 = matrix.m00 * matrix.m11 * matrix.m22 + matrix.m01 * matrix.m12 * matrix.m20 + matrix.m02 * matrix.m10 * matrix.m21 - matrix.m00 * matrix.m12 * matrix.m21 - matrix.m01 * matrix.m10 * matrix.m22 - matrix.m02 * matrix.m11 * matrix.m20
+        };
+
+        MyMatriz result = new MyMatriz()
+        {
+            m00 = tempMatrix.m00 / detA,
+            m01 = tempMatrix.m01 / detA,
+            m02 = tempMatrix.m02 / detA,
+            m03 = tempMatrix.m03 / detA,
+            m10 = tempMatrix.m10 / detA,
+            m11 = tempMatrix.m11 / detA,
+            m12 = tempMatrix.m12 / detA,
+            m13 = tempMatrix.m13 / detA,
+            m20 = tempMatrix.m20 / detA,
+            m21 = tempMatrix.m21 / detA,
+            m22 = tempMatrix.m22 / detA,
+            m23 = tempMatrix.m23 / detA,
+            m30 = tempMatrix.m30 / detA,
+            m31 = tempMatrix.m31 / detA,
+            m32 = tempMatrix.m32 / detA,
+            m33 = tempMatrix.m33 / detA
+
+        };
+        return result;
+    }
+    public static float Determinant(MyMatriz m)
+    {
+        return
+            m[0, 3] * m[1, 2] * m[2, 1] * m[3, 0] - m[0, 2] * m[1, 3] * m[2, 1] * m[3, 0] -
+            m[0, 3] * m[1, 1] * m[2, 2] * m[3, 0] + m[0, 1] * m[1, 3] * m[2, 2] * m[3, 0] +
+            m[0, 2] * m[1, 1] * m[2, 3] * m[3, 0] - m[0, 1] * m[1, 2] * m[2, 3] * m[3, 0] -
+            m[0, 3] * m[1, 2] * m[2, 0] * m[3, 1] + m[0, 2] * m[1, 3] * m[2, 0] * m[3, 1] +
+            m[0, 3] * m[1, 0] * m[2, 2] * m[3, 1] - m[0, 0] * m[1, 3] * m[2, 2] * m[3, 1] -
+            m[0, 2] * m[1, 0] * m[2, 3] * m[3, 1] + m[0, 0] * m[1, 2] * m[2, 3] * m[3, 1] +
+            m[0, 3] * m[1, 1] * m[2, 0] * m[3, 2] - m[0, 1] * m[1, 3] * m[2, 0] * m[3, 2] -
+            m[0, 3] * m[1, 0] * m[2, 1] * m[3, 2] + m[0, 0] * m[1, 3] * m[2, 1] * m[3, 2] +
+            m[0, 1] * m[1, 0] * m[2, 3] * m[3, 2] - m[0, 0] * m[1, 1] * m[2, 3] * m[3, 2] -
+            m[0, 2] * m[1, 1] * m[2, 0] * m[3, 3] + m[0, 1] * m[1, 2] * m[2, 0] * m[3, 3] +
+            m[0, 2] * m[1, 0] * m[2, 1] * m[3, 3] - m[0, 0] * m[1, 2] * m[2, 1] * m[3, 3] -
+            m[0, 1] * m[1, 0] * m[2, 2] * m[3, 3] + m[0, 0] * m[1, 1] * m[2, 2] * m[3, 3];
+    }
     #endregion
 
 
 
 
 
-    
-    
+
+
 
 }
 //Constructor                           Listo
@@ -505,14 +573,13 @@ public struct MyMatriz
 //Mat zero                              Listo
 //Matriz transpose    (Propierty)       Listo
 //Matriz rotation                       Listo
-//Matriz lossyScanel                    
-//Mat inverse                           
-//Rot transf y scale
+//Matriz lossyScanel                    No
+//Mat inverse                           Listo
+//Rot transf y scale                    Listo?
 //TRS                                   Listo
 //Transpose                             Listo
 //Equals                                Listo
 //Get Row                               Listo
-
 //Set colum Set row Set trs             Listo
 //Y operadores                          Listo
 
