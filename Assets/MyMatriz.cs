@@ -2,7 +2,7 @@
 using UnityEngine.Internal;
 using UnityEngine;
 
-public struct MyMatriz
+public struct MyMatriz : IEquatable<MyMatriz>
 {
     #region Variable
     public float m00; //0.
@@ -102,24 +102,10 @@ public struct MyMatriz
         }
         return false;
     }
-    public override bool Equals(object other)
-    {
-        if (!(other is MyMatriz))
-            return false;
-        MyMatriz matrix4x4 = (MyMatriz)other;
-        if (this.GetColumn(0).Equals((object)matrix4x4.GetColumn(0)) && this.GetColumn(1).Equals((object)matrix4x4.GetColumn(1)) && this.GetColumn(2).Equals((object)matrix4x4.GetColumn(2)))
-            return this.GetColumn(3).Equals((object)matrix4x4.GetColumn(3));
-        return false;
-    }
 
-    public static implicit operator MyMatriz(Matrix4x4 m)
+    public override int GetHashCode()
     {
-        MyMatriz myM = zero;
-        for (int i = 0; i < 16; i++)
-        {
-            myM[i] = m[i];
-        }
-        return myM;
+        return GetColumn(0).GetHashCode() ^ GetColumn(1).GetHashCode() << 2 ^ GetColumn(2).GetHashCode() >> 2 ^ GetColumn(3).GetHashCode() >> 1;
     }
     #endregion
     #region getters
@@ -485,7 +471,7 @@ public struct MyMatriz
             m33 = 1f
         };
     }
-    public MyMatriz TRS(Vector3 pos, Quaternion q, Vector3 s)
+    public static MyMatriz TRS(Vector3 pos, Quaternion q, Vector3 s)
     {
         return ((Translate(pos)) * (Rotate(q)) * Scale(s));
     }
@@ -556,6 +542,36 @@ public struct MyMatriz
             m[0, 2] * m[1, 1] * m[2, 0] * m[3, 3] + m[0, 1] * m[1, 2] * m[2, 0] * m[3, 3] +
             m[0, 2] * m[1, 0] * m[2, 1] * m[3, 3] - m[0, 0] * m[1, 2] * m[2, 1] * m[3, 3] -
             m[0, 1] * m[1, 0] * m[2, 2] * m[3, 3] + m[0, 0] * m[1, 1] * m[2, 2] * m[3, 3];
+    }
+    #endregion
+
+    /// <summary>
+	///pregunta si es igual.
+	/// </summary>
+	public override bool Equals(object other)
+    {
+        if (!(other is MyMatriz))
+        {
+            return false;
+        }
+        MyMatriz quaternion = (MyMatriz)other;
+        return GetColumn(0).Equals(quaternion.GetColumn(0)) && GetColumn(1).Equals(quaternion.GetColumn(1)) && GetColumn(2).Equals(quaternion.GetColumn(2)) && GetColumn(3).Equals(quaternion.GetColumn(3));
+    }
+    /// <summary>
+    ///pregunta si es igual.
+    /// </summary>
+    public bool Equals(MyMatriz other)
+    {
+        return this.GetColumn(0).Equals(other.GetColumn(0)) && this.GetColumn(1).Equals(other.GetColumn(1)) && this.GetColumn(2).Equals(other.GetColumn(2)) && this.GetColumn(3).Equals(other.GetColumn(3));
+    }
+    #region Implicit conversions to and from Unity's Quaternion
+    public static implicit operator Matrix4x4(MyMatriz me)
+    {
+        return new Matrix4x4(me.GetColumn(0), me.GetColumn(1), me.GetColumn(2), me.GetColumn(3));
+    }
+    public static implicit operator MyMatriz(Matrix4x4 other)
+    {
+        return new MyMatriz(other.GetColumn(0), other.GetColumn(1), other.GetColumn(2), other.GetColumn(3));
     }
     #endregion
 }

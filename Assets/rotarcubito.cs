@@ -7,14 +7,14 @@ public class rotarcubito : MonoBehaviour
     public GameObject punto1;
     public GameObject punto2;
     private float a;
-    Matrix4x4 matrix4 = new Matrix4x4();
-    Quaternion ba;
+    MyQuaternion ba;
 
     void Update()
     {
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
+            
             //transform.rotation.To;
             //print(a[1]);
             //print(b[1]);

@@ -22,20 +22,20 @@ public class MatrixDebugger : EditorWindow
 			style.fontSize = 20;
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Translation matrix", style);
-			DrawMatrix(Matrix4x4.Translate(target.transform.position));
+			DrawMatrix(MyMatriz.Translate(target.transform.position));
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Rotation matrix", style);
-			DrawMatrix(Matrix4x4.Rotate(target.transform.rotation));
+			DrawMatrix(MyMatriz.Rotate(target.transform.rotation));
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("Scale matrix", style);
-			DrawMatrix(Matrix4x4.Scale(target.transform.localScale));
+			DrawMatrix(MyMatriz.Scale(target.transform.localScale));
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("TRS matrix",style);
-			DrawMatrix(Matrix4x4.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
+			DrawMatrix(MyMatriz.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
 		}
 	}
 
-	private void DrawMatrix(Matrix4x4 matrix)
+	private void DrawMatrix(MyMatriz matrix)
 	{
 		GUIStyle style = new GUIStyle();
 		style.fontSize = 20;
