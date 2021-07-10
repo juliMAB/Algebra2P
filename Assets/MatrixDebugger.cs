@@ -31,7 +31,11 @@ public class MatrixDebugger : EditorWindow
 			DrawMatrix(MyMatriz.Scale(target.transform.localScale));
 			EditorGUILayout.Space();
 			EditorGUILayout.LabelField("TRS matrix",style);
-			DrawMatrix(MyMatriz.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
+			DrawMatrix(Matrix4x4.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
+			//Debug.Log("Unity:");
+			//Debug.Log(Matrix4x4.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
+			//Debug.Log("MyMatriz:");
+			//Debug.Log(MyMatriz.TRS(target.transform.position, target.transform.rotation, target.transform.localScale));
 		}
 	}
 

@@ -54,30 +54,55 @@ public struct MyMatriz : IEquatable<MyMatriz>
         return res;
     }
     // Multiplies two matrices. Para no olvidarme como se multiplican matrices. se hace una linea recta y una linea horizontal.
-    public static MyMatriz operator *(MyMatriz lhs, MyMatriz rhs)
+    //public static MyMatriz operator *(MyMatriz lhs, MyMatriz rhs)
+    //{
+    //    MyMatriz res;
+    //    res.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
+    //    res.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
+    //    res.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;
+    //    res.m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33;
+
+    //    res.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30;
+    //    res.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31;
+    //    res.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32;
+    //    res.m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33;
+
+    //    res.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30;
+    //    res.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31;
+    //    res.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32;
+    //    res.m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33;
+
+    //    res.m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30;
+    //    res.m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31;
+    //    res.m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32;
+    //    res.m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33;
+
+    //    return res;
+    //}
+    public static MyMatriz operator *(MyMatriz a, MyMatriz b)//Fila por columna//Componente a componente
     {
-        MyMatriz res;
-        res.m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
-        res.m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
-        res.m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;
-        res.m03 = lhs.m00 * rhs.m03 + lhs.m01 * rhs.m13 + lhs.m02 * rhs.m23 + lhs.m03 * rhs.m33;
-
-        res.m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20 + lhs.m13 * rhs.m30;
-        res.m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21 + lhs.m13 * rhs.m31;
-        res.m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22 + lhs.m13 * rhs.m32;
-        res.m13 = lhs.m10 * rhs.m03 + lhs.m11 * rhs.m13 + lhs.m12 * rhs.m23 + lhs.m13 * rhs.m33;
-
-        res.m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20 + lhs.m23 * rhs.m30;
-        res.m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21 + lhs.m23 * rhs.m31;
-        res.m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22 + lhs.m23 * rhs.m32;
-        res.m23 = lhs.m20 * rhs.m03 + lhs.m21 * rhs.m13 + lhs.m22 * rhs.m23 + lhs.m23 * rhs.m33;
-
-        res.m30 = lhs.m30 * rhs.m00 + lhs.m31 * rhs.m10 + lhs.m32 * rhs.m20 + lhs.m33 * rhs.m30;
-        res.m31 = lhs.m30 * rhs.m01 + lhs.m31 * rhs.m11 + lhs.m32 * rhs.m21 + lhs.m33 * rhs.m31;
-        res.m32 = lhs.m30 * rhs.m02 + lhs.m31 * rhs.m12 + lhs.m32 * rhs.m22 + lhs.m33 * rhs.m32;
-        res.m33 = lhs.m30 * rhs.m03 + lhs.m31 * rhs.m13 + lhs.m32 * rhs.m23 + lhs.m33 * rhs.m33;
-
-        return res;
+        MyMatriz ret = zero;
+        for (int i = 0; i < 4; i++)
+        {
+            ret.SetColumn(i, a * b.GetColumn(i));
+        }
+        ret.m00 = (float)((double)a.m00 * (double)b.m00 + (double)a.m01 * (double)b.m10 + (double)a.m02 * (double)b.m20 + (double)a.m03 * (double)b.m30);
+        ret.m01 = (float)((double)a.m00 * (double)b.m01 + (double)a.m01 * (double)b.m11 + (double)a.m02 * (double)b.m21 + (double)a.m03 * (double)b.m31);
+        ret.m02 = (float)((double)a.m00 * (double)b.m02 + (double)a.m01 * (double)b.m12 + (double)a.m02 * (double)b.m22 + (double)a.m03 * (double)b.m32);
+        ret.m03 = (float)((double)a.m00 * (double)b.m03 + (double)a.m01 * (double)b.m13 + (double)a.m02 * (double)b.m23 + (double)a.m03 * (double)b.m33);
+        ret.m10 = (float)((double)a.m10 * (double)b.m00 + (double)a.m11 * (double)b.m10 + (double)a.m12 * (double)b.m20 + (double)a.m13 * (double)b.m30);
+        ret.m11 = (float)((double)a.m10 * (double)b.m01 + (double)a.m11 * (double)b.m11 + (double)a.m12 * (double)b.m21 + (double)a.m13 * (double)b.m31);
+        ret.m12 = (float)((double)a.m10 * (double)b.m02 + (double)a.m11 * (double)b.m12 + (double)a.m12 * (double)b.m22 + (double)a.m13 * (double)b.m32);
+        ret.m13 = (float)((double)a.m10 * (double)b.m03 + (double)a.m11 * (double)b.m13 + (double)a.m12 * (double)b.m23 + (double)a.m13 * (double)b.m33);
+        ret.m20 = (float)((double)a.m20 * (double)b.m00 + (double)a.m21 * (double)b.m10 + (double)a.m22 * (double)b.m20 + (double)a.m23 * (double)b.m30);
+        ret.m21 = (float)((double)a.m20 * (double)b.m01 + (double)a.m21 * (double)b.m11 + (double)a.m22 * (double)b.m21 + (double)a.m23 * (double)b.m31);
+        ret.m22 = (float)((double)a.m20 * (double)b.m02 + (double)a.m21 * (double)b.m12 + (double)a.m22 * (double)b.m22 + (double)a.m23 * (double)b.m32);
+        ret.m23 = (float)((double)a.m20 * (double)b.m03 + (double)a.m21 * (double)b.m13 + (double)a.m22 * (double)b.m23 + (double)a.m23 * (double)b.m33);
+        ret.m30 = (float)((double)a.m30 * (double)b.m00 + (double)a.m31 * (double)b.m10 + (double)a.m32 * (double)b.m20 + (double)a.m33 * (double)b.m30);
+        ret.m31 = (float)((double)a.m30 * (double)b.m01 + (double)a.m31 * (double)b.m11 + (double)a.m32 * (double)b.m21 + (double)a.m33 * (double)b.m31);
+        ret.m32 = (float)((double)a.m30 * (double)b.m02 + (double)a.m31 * (double)b.m12 + (double)a.m32 * (double)b.m22 + (double)a.m33 * (double)b.m32);
+        ret.m33 = (float)((double)a.m30 * (double)b.m03 + (double)a.m31 * (double)b.m13 + (double)a.m32 * (double)b.m23 + (double)a.m33 * (double)b.m33);
+        return ret;
     }
     public static bool operator ==(MyMatriz lhs, MyMatriz rhs)
     {
@@ -398,22 +423,22 @@ public struct MyMatriz : IEquatable<MyMatriz>
     {
         return new MyMatriz()
         {
-            m00 = 0.0f,
+            m00 = 1f,
             m01 = 0.0f,
             m02 = 0.0f,
             m03 = v.x,
             m10 = 0.0f,
-            m11 = 0.0f,
+            m11 = 1f,
             m12 = 0.0f,
             m13 = v.y,
             m20 = 0.0f,
             m21 = 0.0f,
-            m22 = 0.0f,
+            m22 = 1f,
             m23 = v.z,
             m30 = 0.0f,
             m31 = 0.0f,
             m32 = 0.0f,
-            m33 = 0.0f
+            m33 = 1f
         };
     }
     public static MyMatriz Rotate(Quaternion q)
@@ -431,17 +456,17 @@ public struct MyMatriz : IEquatable<MyMatriz>
         float num11 = q.w * num2;
         float num12 = q.w * num3;
         MyMatriz matrix4x4;
-        matrix4x4.m00 = (float)(1.0 - ((double)num5 + (double)num6));
+        matrix4x4.m00 = (float)(1.0 - (num5 + num6));
         matrix4x4.m10 = num7 + num12;
         matrix4x4.m20 = num8 - num11;
         matrix4x4.m30 = 0.0f;
         matrix4x4.m01 = num7 - num12;
-        matrix4x4.m11 = (float)(1.0 - ((double)num4 + (double)num6));
+        matrix4x4.m11 = (float)(1.0 - (num4 + num6));
         matrix4x4.m21 = num9 + num10;
         matrix4x4.m31 = 0.0f;
         matrix4x4.m02 = num8 + num11;
         matrix4x4.m12 = num9 - num10;
-        matrix4x4.m22 = (float)(1.0 - ((double)num4 + (double)num5));
+        matrix4x4.m22 = (float)(1.0 - (num4 + num5));
         matrix4x4.m32 = 0.0f;
         matrix4x4.m03 = 0.0f;
         matrix4x4.m13 = 0.0f;
@@ -473,7 +498,12 @@ public struct MyMatriz : IEquatable<MyMatriz>
     }
     public static MyMatriz TRS(Vector3 pos, Quaternion q, Vector3 s)
     {
-        return ((Translate(pos)) * (Rotate(q)) * Scale(s));
+        MyMatriz translate = Translate(pos);
+        MyMatriz rotation = Rotate(q);
+        MyMatriz scale = Scale(s);
+
+        return translate * rotation * scale;
+        //return Translate(pos) * Rotate(q) * Scale(s);
     }
     public static MyMatriz Inverse(MyMatriz matrix)
     {
@@ -574,6 +604,8 @@ public struct MyMatriz : IEquatable<MyMatriz>
         return new MyMatriz(other.GetColumn(0), other.GetColumn(1), other.GetColumn(2), other.GetColumn(3));
     }
     #endregion
+
+    public override string ToString() => String.Format("{0:F5}\t{1:F5}\t{2:F5}\t{3:F5}\n{4:F5}\t{5:F5}\t{6:F5}\t{7:F5}\n{8:F5}\t{9:F5}\t{10:F5}\t{11:F5}\n{12:F5}\t{13:F5}\t{14:F5}\t{15:F5}\n", (object)this.m00, (object)this.m01, (object)this.m02, (object)this.m03, (object)this.m10, (object)this.m11, (object)this.m12, (object)this.m13, (object)this.m20, (object)this.m21, (object)this.m22, (object)this.m23, (object)this.m30, (object)this.m31, (object)this.m32, (object)this.m33);
 }
 //Constructor                           Listo
 //La mentira    (El get usando [])      Listo

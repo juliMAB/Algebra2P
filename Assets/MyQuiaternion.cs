@@ -90,7 +90,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	{
 		get
 		{
-			//lo pasa a grados.
+			//lo pasa a grados de radianes.
 			return ToEulerRad(this) * Mathf.Rad2Deg;
 		}
 		set
