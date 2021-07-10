@@ -579,27 +579,30 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// </summary>
 	private static MyQuaternion FromEulerRad(Vector3 euler)
 	{
-		
-		MyQuaternion value;
+		MyQuaternion qx = identity;
+		MyQuaternion qy = identity;
+		MyQuaternion qz = identity;
+		MyQuaternion res= identity;
 		//el 0.5f es la mitad de grado a radian.
 		//para el euler a radianes.
 		euler.x = euler.x * 0.5f;
 		euler.y = euler.y * 0.5f;
 		euler.z = euler.z * 0.5f;
-
+		//se calcula el seno del angulo en la componente imaginalia.
+		//y el coseno del angulo en la componente real.
 		float sinX = Mathf.Sin(euler.x);
 		float cosX = Mathf.Cos(euler.x);
+		qx.Set(sinX, 0, 0, cosX);
 		float sinY = Mathf.Sin(euler.y);
 		float cosY = Mathf.Cos(euler.y);
+		qy.Set(0, sinY, 0, sinY);
 		float sinZ = Mathf.Sin(euler.z);
 		float cosZ = Mathf.Cos(euler.z);
+		qz.Set(0, 0, cosZ, sinZ);
+		//y se aplican las 3 rotaciones en este orden especifico.
+		res = qy * qx * qz;
 
-		value.w = cosY * cosX * cosZ + sinY * sinX * sinZ;
-		value.x = cosY * sinX * cosZ + sinY * cosX * sinZ;
-		value.y = sinY * cosX * cosZ - cosY * sinX * sinZ;
-		value.z = cosY * cosX * sinZ - sinY * sinX * cosZ;
-
-		return value;
+		return res;
 	}
 	/// <summary>
 	///devuelve todos los angulos de 360 a 0.
