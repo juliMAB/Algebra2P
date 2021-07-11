@@ -214,11 +214,11 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="axis"></param>
 	public static MyQuaternion AngleAxis(float angle, Vector3 axis)
 	{
-		return MyQuaternion.AngleAxis(angle, ref axis);
+		return AngleAxis(angle, ref axis);
 	}
 	private static MyQuaternion AngleAxis(float degress, ref Vector3 axis)
 	{
-		if (axis.sqrMagnitude == 0.0f)
+		if (axis.sqrMagnitude == 0.0f) 
 			return identity;
 
 		MyQuaternion result = identity;
@@ -244,7 +244,10 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// </summary>
 	public static MyQuaternion FromToRotation(Vector3 fromDirection, Vector3 toDirection)
 	{
-		return RotateTowards(LookRotation(fromDirection), LookRotation(toDirection), float.MaxValue);
+		//va a girar sobre axis la cantidad de angle.
+		Vector3 axis = Vector3.Cross(fromDirection, toDirection);
+		float angle = Vector3.Angle(fromDirection, toDirection);
+		return AngleAxis(angle,axis.normalized);
 	}
 	/// <summary>
 	///   <para>crea una rotacion desdelaDireccion a la direccion2.</para>
@@ -471,13 +474,13 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
     /// </summary>
     public static MyQuaternion RotateTowards(MyQuaternion from, MyQuaternion to, float maxDegreesDelta)
 	{
-		float num = MyQuaternion.Angle(from, to);
+		float num = Angle(from, to);
 		if (num == 0f)
 		{
 			return to;
 		}
 		float t = Math.Min(1f, maxDegreesDelta / num);
-		return MyQuaternion.SlerpUnclamped(from, to, t);
+		return SlerpUnclamped(from, to, t);
 	}
 	/// <summary>
 	///   <para>Returns the Inverse of /rotation/.</para>
@@ -485,13 +488,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="rotation"></param>
 	public static MyQuaternion Inverse(MyQuaternion rotation)
 	{
-		float lengthSq = rotation.LengthSquared;
-		if (lengthSq != 0.0)
-		{
-			float i = 1.0f / lengthSq;
-			return new MyQuaternion(rotation.xyz * -i, rotation.w * i);
-		}
-		return rotation;
+		return new Quaternion(-rotation.x,-rotation.y,-rotation.z,rotation.w);
 	}
 	/// <summary>
 	///   <para>Returns a nicely formatted string of the MyQuaternion.</para>
@@ -516,7 +513,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="b"></param>
 	public static float Angle(MyQuaternion a, MyQuaternion b)
 	{
-		float f = MyQuaternion.Dot(a, b);
+		float f = Dot(a, b);
 		return Mathf.Acos(Mathf.Min(Mathf.Abs(f), 1f)) * 2f * Mathf.Rad2Deg;
 	}
 	/// <summary>
@@ -542,24 +539,32 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// </summary>
 	private static Vector3 ToEulerRad(MyQuaternion rotation)
 	{
-		//singularidad: dada sieras reglas matemacias no funciona.
+		//singularidad: es cuando dados ciertos valores, las reglas matematicas fallan. como 40/0
+		//sieras reglas matemacias no se aplican para ciertas reglas matematicas,
+		//primero normalizo el quaternion-----
 		float sqw = rotation.w * rotation.w;
 		float sqx = rotation.x * rotation.x;
 		float sqy = rotation.y * rotation.y;
 		float sqz = rotation.z * rotation.z;
+		//---------------------------------
+		//unit no va a dar 1 siempre que el quaternion este normalizado, en caso de que no, se utilizara
+		//como escalar para normalizar
+		//aplicarlo a este quaternion.
 		float unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
 		float test = rotation.x * rotation.w - rotation.y * rotation.z;
+		//test nos va a devolver el valor de x
 		Vector3 v;
-		//no tengo ni la menor idea de que son las singularidades de los polos.
-		//si x esta muy cerca de 90 o de - 90 se corrigen. porque x e y pasan a fucionarse.
-		if (test > 0.4995f * unit)
+		//si x esta muy cerca de 90 o de - 90 se corrigen. porque x va a estar muy cerca de z.
+		//lo que hace principalmene es calcularlo de la siguiente manera.
+		//singularidad llamada gimbal lock
+		if (test > 0.4999f * unit)
 		{ // singularity at north pole
 			v.y = 2f * Mathf.Atan2(rotation.y, rotation.x);
-			v.x = Mathf.PI / 2;
+			v.x = Mathf.PI / 2; //lo que hace aca es darle directamente el valor a x y z lo manda a 0.
 			v.z = 0;
 			return NormalizeAngles(v * Mathf.Rad2Deg);
 		}
-		if (test < -0.4995f * unit)
+		if (test < -0.4999f * unit)
 		{ // singularity at south pole
 			v.y = -2f * Mathf.Atan2(rotation.y, rotation.x);
 			v.x = -Mathf.PI / 2;
@@ -567,16 +572,15 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 			return NormalizeAngles(v * Mathf.Rad2Deg);
 		}
 		//si el quaternion no esta cerca de sus polos, se transforma de la manera contraria a fromEulerRad.
-		//al principio no entendia el orden de este nuevo quaternion, pero es asi porque el orden afecta el resultado.
+		//https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles#Euler_angles_to_quaternion_conversion.
+		//la inversa de fromEulerRad.
+		//la respuesta correcta, porque asi es la formula.
 		MyQuaternion q = new MyQuaternion(rotation.w, rotation.z, rotation.x, rotation.y);
 		v.y = Mathf.Atan2(2f * q.x * q.w + 2f * q.y * q.z, 1 - 2f * (q.z * q.z + q.w * q.w));       // Yaw
 		v.x = Mathf.Asin(2f * (q.x * q.z - q.w * q.y));												// Pitch
 		v.z = Mathf.Atan2(2f * q.x * q.y + 2f * q.z * q.w, 1 - 2f * (q.y * q.y + q.z * q.z));       // Roll
 		return NormalizeAngles(v * Mathf.Rad2Deg);
 	}
-	/// <summary>
-	///pasa de euler a quaternion.
-	/// </summary>
 	private static MyQuaternion FromEulerRad(Vector3 euler)
 	{
 		MyQuaternion qx = identity;
@@ -595,10 +599,10 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		qx.Set(sinX, 0, 0, cosX);
 		float sinY = Mathf.Sin(euler.y);
 		float cosY = Mathf.Cos(euler.y);
-		qy.Set(0, sinY, 0, sinY);
+		qy.Set(0, sinY, 0, cosY);
 		float sinZ = Mathf.Sin(euler.z);
 		float cosZ = Mathf.Cos(euler.z);
-		qz.Set(0, 0, cosZ, sinZ);
+		qz.Set(0, 0, cosZ, cosZ);
 		//y se aplican las 3 rotaciones en este orden especifico.
 		res = qy * qx * qz;
 
@@ -629,7 +633,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	//deprecado.
 	private static void ToAxisAngleRad(MyQuaternion q, out Vector3 axis, out float angle)
 	{
-		if (System.Math.Abs(q.w) > 1.0f)
+		if (Math.Abs(q.w) > 1.0f)
 			q.Normalize();
 		angle = 2.0f * Mathf.Acos(q.w); // angle
 		float den = Mathf.Sqrt(1.0f - q.w * q.w);
