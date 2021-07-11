@@ -631,22 +631,22 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	}
 
 	//deprecado.
-	private static void ToAxisAngleRad(MyQuaternion q, out Vector3 axis, out float angle)
+	private void ToAxisAngleRad(MyQuaternion q, out Vector3 axis, out float angle)
 	{
 		if (Math.Abs(q.w) > 1.0f)
 			q.Normalize();
 		angle = 2.0f * Mathf.Acos(q.w); // angle
-		float den = Mathf.Sqrt(1.0f - q.w * q.w);
-		if (den > 0.0001f)
+		float mag = Mathf.Sqrt(1.0f - q.w * q.w);
+		if (mag > 0.0001f)
 		{
-			axis = q.xyz / den;
+			axis = q.xyz / mag;
 		}
 		else
 		{
-			// This occurs when the angle is zero. 
-			// Not a problem: just set an arbitrary normalized axis.
+			//si el angulo es 0 se pasa un eje arbitrario.
 			axis = new Vector3(1, 0, 0);
 		}
+		//devuelve un eje axis que rotado la cantidad de angle me devuelve el q.
 	}
 
     #region operators
