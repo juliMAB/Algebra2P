@@ -82,7 +82,23 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 		}
 	}
 	#endregion
+	#region Constructores
+	public MyQuaternion(float x, float y, float z, float w)
+	{
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
+	}
 
+	private MyQuaternion(Vector3 v, float w)
+	{
+		this.x = v.x;
+		this.y = v.y;
+		this.z = v.z;
+		this.w = w;
+	}
+	#endregion
 
 
 	//   Te devuelve el angulo en grados, ya que para conseguir los angulos con ToEulerRag te los da en radianes.</para>
@@ -136,32 +152,8 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	/// <param name="y"></param>
 	/// <param name="z"></param>
 	/// <param name="w"></param>
-	public MyQuaternion(float x, float y, float z, float w)
-	{
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.w = w;
-	}
-	/// <summary>
-	/// Construct a new MyQuaternion from vector and w components
-	/// </summary>
-	/// <param name="v">The vector part</param>
-	/// <param name="w">The w part</param>
-	private MyQuaternion(Vector3 v, float w)
-	{
-		this.x = v.x;
-		this.y = v.y;
-		this.z = v.z;
-		this.w = w;
-	}
-	/// <summary>
-	///   <para>Set x, y, z and w components of an existing MyQuaternion.</para>
-	/// </summary>
-	/// <param name="newX">x</param>
-	/// <param name="newY">y</param>
-	/// <param name="newZ">z</param>
-	/// <param name="newW">w</param>
+	
+	
 	public void Set(float newX, float newY, float newZ, float newW)
     {
         this.x = newX;
@@ -256,15 +248,6 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	{
 		this = FromToRotation(fromDirection, toDirection);
 	}
-	public static MyQuaternion LookRotation(Vector3 forward, [DefaultValue("Vector3.up")] Vector3 upwards)
-	{
-		return LookRotation(ref forward, ref upwards);
-	}
-	public static MyQuaternion LookRotation(Vector3 forward)
-	{
-		Vector3 up = Vector3.up;
-		return LookRotation(ref forward, ref up);
-	}
 	/// <summary>
 	///estoy es muy complejo amigo.
 	///my resumido, se plantea una matriz.
@@ -272,7 +255,7 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	///podes ir haciendo preguntar para ir descartando y saber cual no es el 0.
 	///siempre entra en alguno de los ifs, estos son principalmente para no entrar en un nan.
 	/// </summary>
-	private static MyQuaternion LookRotation(ref Vector3 forward, ref Vector3 up)
+	private static MyQuaternion LookRotation(Vector3 forward, Vector3 up)
 	{
 		forward = Vector3.Normalize(forward);
 		Vector3 right = Vector3.Normalize(Vector3.Cross(up, forward));
@@ -333,42 +316,6 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
 	///   Crea la rotacion de donde mira y con que cara, que por defecto es up.
 	/// view es la direccion a donde va a mirar.
 	/// </summary>
-	public void SetLookRotation(Vector3 view)
-	{
-		Vector3 up = Vector3.up;
-		SetLookRotation(view, up);
-	}
-	/// <summary>
-	///   Crea la rotacion de donde mira y adonde.
-	/// view es la direccion a donde va a mirar.
-	/// up es la cara que va a mirar en esa direccion.
-	/// </summary>
-	public void SetLookRotation(Vector3 view, [DefaultValue("Vector3.up")] Vector3 up)
-	{
-		this = LookRotation(view, up);
-	}
-    /// <summary>
-    ///   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is clamped to the range [0, 1].</para>
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <param name="t"></param>
-    //public static MyQuaternion Slerp(MyQuaternion a, MyQuaternion b, float t)
-    //{
-    //	return Slerp(ref a, ref b, t);
-    //}
-    //private static MyQuaternion Slerp(ref MyQuaternion a, ref MyQuaternion b, float t)
-    //{
-    //	if (t > 1) t = 1;
-    //	if (t < 0) t = 0;
-    //	return SlerpUnclamped(ref a, ref b, t);
-    //}
-    ///// <summary>
-    /////   <para>Spherically interpolates between /a/ and /b/ by t. The parameter /t/ is not clamped.</para>
-    ///// </summary>
-    ///// <param name="a"></param>
-    ///// <param name="b"></param>
-    ///// <param name="t"></param>
     public static MyQuaternion SlerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
     {
         return SlerpUnclamped(ref a, ref b, t);
@@ -428,47 +375,29 @@ public struct MyQuaternion : IEquatable<MyQuaternion>
         else
             return identity;
     }
-    ///// <summary>
-    /////   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is clamped to the range [0, 1].</para>
-    ///// </summary>
-    ///// <param name="a"></param>
-    ///// <param name="b"></param>
-    ///// <param name="t"></param>
-    //public static MyQuaternion Lerp(MyQuaternion a, MyQuaternion b, float t)
-    //{
-    //	if (t > 1) t = 1;
-    //	if (t < 0) t = 0;
-    //	return Slerp(ref a, ref b, t); // TODO: use lerp not slerp, "Because quaternion works in 4D. Rotation in 4D are linear" ???
-    //}
-    ///// <summary>
-    /////   <para>Interpolates between /a/ and /b/ by /t/ and normalizes the result afterwards. The parameter /t/ is not clamped.</para>
-    ///// </summary>
-    ///// <param name="a"></param>
-    ///// <param name="b"></param>
-    ///// <param name="t"></param>
-    //public static MyQuaternion LerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
-    //{
-    //	return LerpUnclamped(ref a, ref b, t);
-    //}
-    //private static MyQuaternion LerpUnclamped(ref MyQuaternion a, ref MyQuaternion b, float t)
-    //{
-    //	MyQuaternion q = new Quaternion(0, 0, 0, 0);
-    //	if (Dot(a, b) < 0)
-    //	{
-    //		q.x = a.x + t * (-b.x - a.x);
-    //		q.y = a.y + t * (-b.y - a.y);
-    //		q.z = a.z + t * (-b.z - a.z);
-    //		q.w = a.w + t * (-b.w - b.w);
-    //	}
-    //	else
-    //	{
-    //		q.x = a.x + t * (b.x - a.x);
-    //		q.y = a.y + t * (b.y - a.y);
-    //		q.z = a.z + t * (b.z - a.z);
-    //		q.w = a.w + t * (b.w - b.w);
-    //	}
-    //	return q.normalized;
-    //}
+
+    public static MyQuaternion LerpUnclamped(MyQuaternion a, MyQuaternion b, float t)
+    {
+		MyQuaternion res = identity;
+		float timeLeft = 1.0f - t;
+        if (Dot(a,b)>=0)
+        {
+			res.x = (timeLeft * a.x) + (t * b.x);
+			res.y = (timeLeft * a.y) + (t * b.y);
+			res.z = (timeLeft * a.z) + (t * b.z);
+			res.w = (timeLeft * a.w) + (t * b.w);
+		}
+        else
+        {
+			res.x = (timeLeft * a.x) - (t * b.x);
+			res.y = (timeLeft * a.y) - (t * b.y);
+			res.z = (timeLeft * a.z) - (t * b.z);
+			res.w = (timeLeft * a.w) - (t * b.w);
+		}
+		res.Normalize();
+		return res;
+    }
+    
     /// <summary>
     ///   te va a devolver la rotacion que se requiere para pasar de de from a to
     /// </summary>
